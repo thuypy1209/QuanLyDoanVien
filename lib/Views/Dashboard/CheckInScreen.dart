@@ -3,8 +3,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../Services/CheckInService.dart';
-import '../Screen/CheckInHistoryScreen.dart';
+import 'package:quanlidoanvien/Services/CheckInService.dart';
+import 'package:quanlidoanvien/Views/Screen/CheckInHistoryScreen.dart';
+import 'dart:convert';
 
 class CheckInScreen extends StatefulWidget {
   const CheckInScreen({super.key});
@@ -15,8 +16,6 @@ class CheckInScreen extends StatefulWidget {
 
 class _CheckInScreenState extends State<CheckInScreen> {
   final MobileScannerController _controller = MobileScannerController();
-
-  // --- 1. XỬ LÝ QUYỀN VÀ MỞ CAMERA (Đã sửa để hứng kết quả) ---
   Future<void> _requestCameraPermission() async {
     var status = await Permission.camera.status;
     if (status.isDenied) {
@@ -25,13 +24,10 @@ class _CheckInScreenState extends State<CheckInScreen> {
 
     if (status.isGranted) {
       if (mounted) {
-        // 👉 SỬA: Dùng 'await' để đợi kết quả trả về từ màn hình quét
         final code = await Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const QRScanView()),
         );
-
-        // 👉 SỬA: Nếu có code trả về thì gọi API ngay
         if (code != null && code is String && mounted) {
           _handleScanResult(code);
         }
@@ -40,8 +36,6 @@ class _CheckInScreenState extends State<CheckInScreen> {
       if (mounted) _showSettingsDialog();
     }
   }
-
-  // --- 2. CHỌN ẢNH TỪ THƯ VIỆN (Đã sửa để gọi API) ---
   Future<void> _scanFromGallery() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
@@ -51,8 +45,6 @@ class _CheckInScreenState extends State<CheckInScreen> {
 
       if (barcodes != null && barcodes.barcodes.isNotEmpty) {
         final String code = barcodes.barcodes.first.rawValue ?? "";
-
-        // 👉 SỬA: Gọi hàm xử lý API thay vì hiện Dialog
         if (code.isNotEmpty && mounted) {
           _handleScanResult(code);
         }
@@ -66,9 +58,23 @@ class _CheckInScreenState extends State<CheckInScreen> {
     }
   }
 
-  // --- 3. HÀM GỌI API CHECK-IN (Quan trọng nhất) ---
   void _handleScanResult(String code) async {
-    // 1. Hiện Loading
+    String activityId = "";
+
+    try {
+      // 1. Giải mã JSON từ chuỗi QR nhận được
+      final Map<String, dynamic> data = jsonDecode(code);
+
+      if (data['type'] == 'CHECKIN_ACTIVITY') {
+        activityId = data['id'].toString(); // Lấy ID hoạt động
+      } else {
+        _showSimpleDialog("Lỗi", "Mã QR không hợp lệ cho hệ thống điểm danh.");
+        return;
+      }
+    } catch (e) {
+      activityId = code;
+    }
+    // 2. Hiện Loading
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -77,8 +83,6 @@ class _CheckInScreenState extends State<CheckInScreen> {
 
     // 2. Gọi Service
     final service = CheckInService();
-    // Lưu ý: Code gửi lên Server sẽ là ID hoạt động (nếu bạn đã sửa Backend theo hướng dẫn trước)
-    // Hoặc ID đăng ký (nếu dùng Backend cũ)
     final response = await service.submitCheckIn(code);
 
     // 3. Tắt Loading
@@ -108,7 +112,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
             TextButton(
               onPressed: () {
                 Navigator.pop(ctx);
-                // Nếu thành công -> Chuyển sang xem lịch sử luôn cho ngầu
+
                 if (response.isSuccess) {
                   _navigateToHistory();
                 }
@@ -120,7 +124,16 @@ class _CheckInScreenState extends State<CheckInScreen> {
       );
     }
   }
-
+  void _showSimpleDialog(String title, String content) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Đóng"))],
+      ),
+    );
+  }
   void _navigateToHistory() {
     Navigator.push(
       context,
@@ -235,7 +248,6 @@ class _CheckInScreenState extends State<CheckInScreen> {
   }
 }
 
-// --- MÀN HÌNH QUÉT CAMERA (Đã sửa logic trả về) ---
 class QRScanView extends StatefulWidget {
   const QRScanView({super.key});
 
@@ -244,7 +256,7 @@ class QRScanView extends StatefulWidget {
 }
 
 class _QRScanViewState extends State<QRScanView> {
-  bool isScanned = false; // Cờ để tránh quét liên tục nhiều lần
+  bool isScanned = false;
 
   @override
   Widget build(BuildContext context) {
@@ -252,14 +264,11 @@ class _QRScanViewState extends State<QRScanView> {
       appBar: AppBar(title: const Text("Đang quét..."), backgroundColor: Colors.black, foregroundColor: Colors.white),
       body: MobileScanner(
         onDetect: (capture) {
-          // Chỉ xử lý nếu chưa quét lần nào
           if (!isScanned && capture.barcodes.isNotEmpty) {
             final String code = capture.barcodes.first.rawValue ?? "";
 
             if (code.isNotEmpty) {
-              setState(() => isScanned = true); // Khóa lại ngay
-
-              // 👉 SỬA: Đóng màn hình này và trả Code về màn hình trước
+              setState(() => isScanned = true);
               Navigator.pop(context, code);
             }
           }

@@ -4,11 +4,9 @@ import '../Repository/AuthRepository.dart';
 class AuthService {
   late AuthRepository authRepository;
 
-  // Constructor khởi tạo Repository
   AuthService() {
     this.authRepository = AuthRepository();
   }
-  // Hàm Đăng ký (Gọi từ Repository)
   Future<ApiResponse<bool>> register({
     required String mssv,
     required String password,
@@ -26,7 +24,6 @@ class AuthService {
       lop: lop,
     );
   }
-  // Hàm Đăng nhập (Gọi từ Repository)
   Future<ApiResponse<dynamic>> login(String username, String password) async {
     return await authRepository.login(username, password);
   }

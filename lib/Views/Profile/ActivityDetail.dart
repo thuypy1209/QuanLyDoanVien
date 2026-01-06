@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../Models/ActivityModel.dart';
-import '../../Services/ActivityService.dart';
+import 'package:quanlidoanvien/Models/ActivityModel.dart';
+import 'package:quanlidoanvien/Services/ActivityService.dart';
 
 class ActivityDetail extends StatefulWidget {
   final ActivityModel activity;
@@ -20,7 +20,6 @@ class _ActivityDetailState extends State<ActivityDetail> {
     _isRegistered = widget.activity.isRegistered;
   }
 
-  // --- SỬA HÀM ĐĂNG KÝ ĐỂ KHỚP VỚI REPOSITORY ---
   void _handleRegister() async {
     setState(() => _isRegistering = true);
 

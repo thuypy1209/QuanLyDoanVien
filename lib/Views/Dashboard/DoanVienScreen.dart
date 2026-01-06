@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../Services/StudentService.dart';
-import '../../Models/StudentModel.dart';
-import '../../Services/ActivityService.dart';
-import '../../Models/ActivityModel.dart';
-import '../../Utils.dart';
+import 'package:quanlidoanvien/Services/StudentService.dart';
+import 'package:quanlidoanvien/Models/StudentModel.dart';
+import 'package:quanlidoanvien/Services/ActivityService.dart';
+import 'package:quanlidoanvien/Models/ActivityModel.dart';
+import 'package:quanlidoanvien/Utils.dart';
 import 'CheckInScreen.dart';
 import 'package:quanlidoanvien/Views/Screen/CheckInHistoryScreen.dart';
 import 'package:quanlidoanvien/Views/Profile/ActivityDetail.dart';
@@ -28,12 +28,11 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
     _fetchData();
   }
 
-  // --- 1. HÀM LẤY DỮ LIỆU (Đã xóa log rác) ---
   Future<void> _fetchData() async {
     final studentService = StudentService();
     final activityService = ActivityService();
 
-    // A. LẤY THÔNG TIN TỪ BỘ NHỚ MÁY
+
     final localInfo = await Utils.getUserInfo();
 
     final localStudent = StudentModel(
@@ -50,7 +49,6 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
     }
 
     try {
-      // B. GỌI API CẬP NHẬT
       final results = await Future.wait([
         studentService.getStudentInfo(),
         activityService.getActivities(),
@@ -59,24 +57,22 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
 
       if (mounted) {
         setState(() {
-          // 1. Cập nhật Student
           final studentRes = results[0] as dynamic;
           if (studentRes.isSuccess && studentRes.data != null) {
             _student = studentRes.data;
           }
 
-          // 2. Xử lý danh sách hoạt động và khớp trạng thái đăng ký
           final activityRes = results[1] as dynamic;
           final historyRes = results[2] as dynamic;
 
           if (activityRes.isSuccess) {
             List<ActivityModel> allActivities = activityRes.data ?? [];
 
-            // Logic so sánh: Nếu có trong lịch sử thì đánh dấu là đã đăng ký
+
             if (historyRes.isSuccess && historyRes.data != null) {
               List<ActivityModel> historyList = historyRes.data!;
 
-              // Lấy danh sách ID Hoạt động từ lịch sử
+
               Set<int> registeredIds = historyList.map((e) => e.hoatDongId ?? -1).toSet();
 
               for (var act in allActivities) {
@@ -92,7 +88,7 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
         });
       }
     } catch (e) {
-      // Chỉ giữ lại log lỗi quan trọng nếu cần
+
       if (mounted) setState(() => _isLoading = false);
     }
   }
@@ -136,7 +132,6 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
     );
   }
 
-  // Header thông tin sinh viên
   Widget _buildHeader() {
     String tenHienThi = _student?.hoTen ?? "Sinh viên";
     String mssvHienThi = _student?.mssv ?? "---";
@@ -208,7 +203,6 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
           ),
         ),
 
-        // Khối điểm rèn luyện
         Positioned(
           bottom: -40,
           left: 20,
@@ -274,7 +268,6 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
     );
   }
 
-  // Menu tiện ích
   Widget _buildQuickMenu() {
     return Padding(
       padding: const EdgeInsets.only(top: 50, left: 20, right: 20),
@@ -284,11 +277,14 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
           const Text("Tiện ích", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 15),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // 👇 SỬA Ở ĐÂY: Đổi từ spaceBetween thành spaceEvenly
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _buildMenuItem(Icons.app_registration, "Đăng ký\nHoạt động", Colors.blue, () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const AllActivitiesScreen()));
               }),
+
+              // Nếu dùng MainAxisAlignment.center thì bạn có thể thêm SizedBox(width: 20) ở đây để tạo khoảng cách
 
               _buildMenuItem(Icons.history, "Lịch sử\nTham gia", Colors.orange, () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const CheckInHistoryScreen()));
@@ -296,11 +292,6 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
 
               _buildMenuItem(Icons.qr_code_scanner, "Quét mã\nĐiểm danh", Colors.purple, () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const CheckInScreen()));
-              }),
-
-              // Nút này tạm thời ẩn hoặc để trống nếu chưa làm ScoreScreen
-              _buildMenuItem(Icons.school, "Kết quả\nHọc tập", Colors.green, () {
-                // Navigator.push(context, MaterialPageRoute(builder: (context) => const ScoreScreen()));
               }),
             ],
           ),

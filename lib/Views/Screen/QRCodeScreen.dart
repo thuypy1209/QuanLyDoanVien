@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../Utils.dart';
+import 'package:quanlidoanvien/Utils.dart';
 
 class QRCodeScreen extends StatefulWidget {
   final int activityId;
@@ -33,7 +33,6 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // URL API Backend (Lưu ý dùng 10.0.2.2 cho Emulator)
     final String qrUrl = 'http://10.0.2.2:5000/api/HoatDong/qr/${widget.activityId}';
 
     return Scaffold(

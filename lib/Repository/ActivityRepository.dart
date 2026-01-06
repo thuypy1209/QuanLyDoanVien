@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:quanlidoanvien/Utils.dart';
-import '../Models/ActivityModel.dart';
+import 'package:quanlidoanvien/Models/ActivityModel.dart';
 import 'ApiResponse.dart';
 
 class ActivityRepository {

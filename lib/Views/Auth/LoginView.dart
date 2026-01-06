@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:quanlidoanvien/Utils.dart'; // File Utils mới (có giải mã Token)
-import '../../Components/TextFieldComponent.dart';
-import '../../Services/AuthService.dart';
+import 'package:quanlidoanvien/Utils.dart';
+import 'package:quanlidoanvien/Components/TextFieldComponent.dart';
+import 'package:quanlidoanvien/Services/AuthService.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -19,15 +19,12 @@ class _LoginViewState extends State<LoginView> {
 
   final Color primaryColor = const Color(0xFF0D47A1);
 
-  // --- HÀM XỬ LÝ ĐĂNG NHẬP (ĐÃ SỬA) ---
   Future<void> _handleLogin() async {
     if (_userController.text.isEmpty || _passController.text.isEmpty) {
       _showDialog("Thông báo", "Vui lòng nhập đầy đủ tài khoản và mật khẩu");
       return;
     }
-
     setState(() => _isLoading = true);
-
     try {
       final authService = AuthService();
       // Gọi Login
@@ -35,21 +32,17 @@ class _LoginViewState extends State<LoginView> {
           _userController.text,
           _passController.text
       );
-
       if (response.isSuccess) {
-        // [QUAN TRỌNG] Server trả về JSON: { "Token": "ey...", "Message": "..." }
-        // Chúng ta cần lấy đúng giá trị của key "Token"
         final data = response.data;
         String? token;
 
         if (data is Map<String, dynamic>) {
-          token = data['Token']; // Lấy chuỗi Token trong JSON
+          token = data['Token'];
         } else if (data is String) {
-          token = data; // Dự phòng nếu server trả về chuỗi trần
+          token = data;
         }
 
         if (token != null) {
-          // Gửi Token cho Utils -> Utils sẽ tự Giải mã & Lưu MSSV, Tên, Lớp
           await Utils.saveToken(token);
 
           if (mounted) {

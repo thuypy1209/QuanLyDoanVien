@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../Services/ActivityService.dart';
-import '../../Models/ActivityModel.dart';
+import 'package:quanlidoanvien/Services/ActivityService.dart';
+import 'package:quanlidoanvien/Models/ActivityModel.dart';
 import 'package:quanlidoanvien/Views/Profile/ActivityDetail.dart';
 
 class AllActivitiesScreen extends StatefulWidget {

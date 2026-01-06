@@ -5,7 +5,6 @@ import '../Repository/ApiResponse.dart';
 class ActivityService {
   late ActivityRepository activityRepository;
 
-  // Constructor: Khởi tạo Repository
   ActivityService() {
     this.activityRepository = ActivityRepository();
   }

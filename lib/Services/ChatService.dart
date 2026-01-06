@@ -1,75 +1,59 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-//import 'package:signalr_netcore/signalr_netcore.dart';
-import 'package:quanlidoanvien/Utils.dart';
-import '../Repository/ApiResponse.dart';
+import 'dart:io';
+import 'package:signalr_core/signalr_core.dart';
+import 'package:http/io_client.dart';
+import '../Utils.dart';
 
-// class ChatService {
-//   late HubConnection _hubConnection;
-//   Function(String user, String message)? onMessageReceived;
-//   // 1. Kết nối SignalR (Giữ nguyên)
-//   Future<void> connectSignalR() async {
-//     final token = await Utils.getToken();
-//     final serverUrl = "${Utils.baseUrl}/chathub"; // Lưu ý đường dẫn phải khớp Program.cs
-//
-//     _hubConnection = HubConnectionBuilder()
-//         .withUrl(serverUrl, options: HttpConnectionOptions(
-//       accessTokenFactory: () async => token ?? "",
-//     ))
-//         .build();
-//
-//     _hubConnection.on("ReceiveMessage", (arguments) {
-//       if (arguments != null && arguments.length >= 2) {
-//         final user = arguments[0].toString();
-//         final message = arguments[1].toString();
-//         if (onMessageReceived != null) {
-//           onMessageReceived!(user, message);
-//         }
-//       }
-//     });
-//
-//     try {
-//       await _hubConnection.start();
-//       print(" Đã kết nối SignalR");
-//     } catch (e) {
-//       print(" Lỗi kết nối SignalR: $e");
-//     }
-//   }
+class ChatService {
+  HubConnection? _hubConnection;
+  Function(Map<String, dynamic> data)? onMessageReceived;
+  Function(bool isConnected)? onConnectionChanged;
+  bool get isConnected => _hubConnection?.state == HubConnectionState.connected;
 
-//   // 2. Gửi tin nhắn (Vẫn gọi API nhưng Server không lưu nữa)
-//   Future<ApiResponse<bool>> sendMessage(String content) async {
-//     try {
-//       final token = await Utils.getToken();
-//       final userInfo = await Utils.getUserInfo();
-//
-//       // Lấy tên người gửi từ bộ nhớ máy
-//       final senderName = userInfo['name'] ?? "User";
-//
-//       final url = Uri.parse('${Utils.baseUrl}/api/Chat/send');
-//
-//       final response = await http.post(
-//         url,
-//         headers: {
-//           "Content-Type": "application/json",
-//           "Authorization": "Bearer $token",
-//         },
-//         body: jsonEncode({
-//           "SenderId": senderName, // Gửi tên người gửi để bên kia hiện
-//           "Message": content
-//         }),
-//       );
-//
-//       if (response.statusCode == 200) {
-//         return ApiResponse.success(true);
-//       } else {
-//         return ApiResponse.error("Lỗi gửi tin");
-//       }
-//     } catch (e) {
-//       return ApiResponse.error("Lỗi kết nối: $e");
-//     }
-//   }
-//
-//   // void disconnect() {
-//   //   _hubConnection.stop();
-//   // }
-// }
+  Future<void> initSignalR() async {
+    final token = await Utils.getToken();
+    final serverUrl = "${Utils.baseUrl}/chathub"; //
+    final httpClient = HttpClient()
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+    _hubConnection = HubConnectionBuilder()
+        .withUrl(
+      serverUrl,
+      HttpConnectionOptions(
+        accessTokenFactory: () async => token ?? "", //
+        client: IOClient(httpClient),
+        logging: (level, message) => print("SignalR: $message"),
+      ),
+    )
+        .withAutomaticReconnect()
+        .build();
+    _hubConnection!.on("ReceiveMessage", (List<dynamic>? arguments) {
+      if (arguments != null && arguments.isNotEmpty && onMessageReceived != null) {
+        onMessageReceived!(arguments[0] as Map<String, dynamic>);
+      }
+    });
+
+    _hubConnection!.onclose((error) => onConnectionChanged?.call(false));
+    _hubConnection!.onreconnecting((error) => onConnectionChanged?.call(false));
+    _hubConnection!.onreconnected((connectionId) => onConnectionChanged?.call(true));
+
+    try {
+
+      if (_hubConnection!.state == HubConnectionState.disconnected) {
+        await _hubConnection!.start();
+        onConnectionChanged?.call(true);
+        print("Đã kết nối bằng signalr_core");
+      }
+    } catch (e) {
+      onConnectionChanged?.call(false);
+      print("Lỗi: $e");
+    }
+  }
+  Future<void> sendMessage(String content) async {
+    if (isConnected) {
+
+      await _hubConnection!.invoke("SendMessage", args: [content]);
+    }
+  }
+  void dispose() {
+    _hubConnection?.stop();
+  }
+}

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../Services/ActivityService.dart'; // 👉 Dùng Service này
-import '../../Models/ActivityModel.dart';     // 👉 Dùng Model này
+import 'package:quanlidoanvien/Services/ActivityService.dart';
+import 'package:quanlidoanvien/Models/ActivityModel.dart';
 import 'package:quanlidoanvien/Repository/ApiResponse.dart';
 
 class CheckInHistoryScreen extends StatefulWidget {

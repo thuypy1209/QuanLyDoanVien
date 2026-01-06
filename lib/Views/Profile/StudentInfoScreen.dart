@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../Services/StudentService.dart'; // Import Service
-import '../../Models/StudentModel.dart';     // Import Model bạn vừa gửi
-import '../../Utils.dart';
+import 'package:quanlidoanvien/Services/StudentService.dart'; // Import Service
+import 'package:quanlidoanvien/Models/StudentModel.dart';
+import 'package:quanlidoanvien/Utils.dart';
 
 class StudentInfoScreen extends StatefulWidget {
   const StudentInfoScreen({super.key});

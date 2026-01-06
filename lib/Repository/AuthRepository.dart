@@ -44,7 +44,7 @@ class AuthRepository {
     }
   }
 
-  // 2. Xử lý Đăng nhập (Trả về Token dạng String)
+  // 2. Xử lý Đăng nhập
   Future<ApiResponse<dynamic>> login(String username, String password) async {
     final url = Uri.parse('$baseUrl/login');
 

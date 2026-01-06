@@ -3,7 +3,7 @@ class CheckInHistoryModel {
   final String? tenHoatDong;
   final String? thoiGianCheckIn;
   final bool isSuccess;
-  final int diemCong; // Thêm trường này để hiển thị điểm cộng nếu cần
+  final int diemCong;
 
   CheckInHistoryModel({
     this.id,

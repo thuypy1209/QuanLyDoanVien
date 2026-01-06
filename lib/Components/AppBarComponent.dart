@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../Utils.dart';
+import 'package:quanlidoanvien/Utils.dart';
 
 class AppBarComponent extends StatelessWidget implements PreferredSizeWidget{
   String titleValue;
