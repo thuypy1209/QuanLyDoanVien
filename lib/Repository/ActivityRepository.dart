@@ -89,6 +89,7 @@ class ActivityRepository {
       );
 
       if (response.statusCode == 200) {
+        print("HISTORY JSON: ${response.body}");
         final List<dynamic> jsonData = jsonDecode(response.body);
         List<ActivityModel> activities = jsonData
             .map((item) => ActivityModel.fromJson(item))

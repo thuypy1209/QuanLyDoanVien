@@ -1,14 +1,44 @@
-import 'dart:convert';
+import 'dart:convert'; // 👉 Quan trọng: Import thư viện để giải mã JSON
 import 'package:http/http.dart' as http;
-import '../Utils.dart'; // File Utils chứa baseUrl và getToken
-import '../Models/CheckInHistoryModel.dart'; // Model (Xem code bên dưới)
+import '../Utils.dart';
+import '../Repository/ApiResponse.dart'; // Đảm bảo đường dẫn import đúng với project của bạn
 
 class CheckInService {
-  // 1. GỬI MÃ QR ĐỂ ĐIỂM DANH
-  Future<Map<String, dynamic>> submitCheckIn(String qrCode) async {
+  static const String baseUrl = 'http://10.0.2.2:5000/api/HoatDong';
+
+  // 1. Gửi mã QR lên Server để điểm danh
+  Future<ApiResponse<bool>> submitCheckIn(String qrContent) async {
     try {
-      final token = await Utils.getToken();
-      final url = Uri.parse('${Utils.baseUrl}/api/CheckIn/submit');
+      String? token = await Utils.getToken();
+
+      int? hoatDongId;
+
+      // 👉 BƯỚC 1: Xử lý thông tin từ mã QR
+      try {
+        // Trường hợp A: QR chứa chuỗi JSON (Code mới)
+        // Ví dụ: {"id":4, "ten":"Mùa Hè Xanh", "time":"..."}
+        final Map<String, dynamic> data = jsonDecode(qrContent);
+
+        // Lấy ID hoạt động từ trong JSON
+        hoatDongId = data['id'];
+
+        print("🔍 Đã quét được JSON: $data"); // Log để kiểm tra
+
+      } catch (e) {
+        // Trường hợp B: QR chỉ chứa số (Code cũ hoặc nhập tay)
+        // Nếu jsonDecode lỗi, ta thử ép kiểu trực tiếp sang số
+        hoatDongId = int.tryParse(qrContent);
+      }
+
+      // Kiểm tra nếu không lấy được ID
+      if (hoatDongId == null) {
+        return ApiResponse.error("Mã QR không hợp lệ hoặc không chứa ID hoạt động!");
+      }
+
+      // 👉 BƯỚC 2: Gọi API Check-in
+      // Lưu ý: Vì ID lấy từ QR bây giờ là "ID Hoạt động", nên ta gọi API check-in theo hoạt động
+      // (Bạn cần đảm bảo Backend đã có API 'checkin-by-activity' như hướng dẫn trước)
+      final url = Uri.parse('$baseUrl/checkin-by-activity/$hoatDongId');
 
       final response = await http.post(
         url,
@@ -16,44 +46,28 @@ class CheckInService {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
         },
-        body: jsonEncode({"qrCode": qrCode}),
       );
 
-      final data = jsonDecode(response.body);
-
-      // Trả về kết quả kèm trạng thái success true/false
+      // 👉 BƯỚC 3: Xử lý kết quả
       if (response.statusCode == 200) {
-        return {"success": true, "message": data['message'], "tenHoatDong": data['tenHoatDong']};
+        return ApiResponse.success(true, message: "Điểm danh thành công!");
       } else {
-        return {"success": false, "message": data['message'] ?? "Lỗi không xác định"};
+        // Server trả về lỗi (ví dụ: "Chưa đăng ký", "Đã check-in rồi")
+        // Nếu server trả về JSON lỗi dạng { "message": "..." } thì ta parse ra
+        String errorMsg = response.body;
+        try {
+          final errorJson = jsonDecode(response.body);
+          if (errorJson['message'] != null) {
+            errorMsg = errorJson['message'];
+          }
+        } catch (_) {}
+
+        return ApiResponse.error(errorMsg);
       }
     } catch (e) {
-      return {"success": false, "message": "Lỗi kết nối: $e"};
+      return ApiResponse.error("Lỗi kết nối: $e");
     }
   }
 
-  // 2. LẤY LỊCH SỬ
-  Future<List<CheckInHistoryModel>> getHistory() async {
-    try {
-      final token = await Utils.getToken();
-      final url = Uri.parse('${Utils.baseUrl}/api/CheckIn/history');
-
-      final response = await http.get(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> rawData = jsonDecode(response.body);
-        return rawData.map((e) => CheckInHistoryModel.fromJson(e)).toList();
-      }
-      return [];
-    } catch (e) {
-      print("Error fetching history: $e");
-      return [];
-    }
-  }
+// 2. Lấy lịch sử (Giữ nguyên hoặc dùng ActivityService)
 }

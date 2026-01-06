@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -73,5 +75,16 @@ class Utils {
       'lop': prefs.getString('lop') ?? "...",
       'email': prefs.getString('email') ?? "...",
     };
+  }
+  // Trong file Utils.dart
+  static Future<void> updateAvatarUrl(String newUrl) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userInfoStr = prefs.getString('user_info');
+
+    if (userInfoStr != null) {
+      Map<String, dynamic> userInfo = jsonDecode(userInfoStr);
+      userInfo['avatar'] = newUrl;
+      await prefs.setString('user_info', jsonEncode(userInfo));
+    }
   }
 }

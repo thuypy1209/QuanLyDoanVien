@@ -4,6 +4,10 @@ import '../../Models/StudentModel.dart';
 import '../../Services/ActivityService.dart';
 import '../../Models/ActivityModel.dart';
 import '../../Utils.dart';
+import 'CheckInScreen.dart';
+import 'package:quanlidoanvien/Views/Screen/CheckInHistoryScreen.dart';
+import 'package:quanlidoanvien/Views/Profile/ActivityDetail.dart';
+import 'package:quanlidoanvien/Views/Screen/AllActivitiesScreen.dart';
 
 class DoanVienScreen extends StatefulWidget {
   const DoanVienScreen({super.key});
@@ -24,24 +28,21 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
     _fetchData();
   }
 
-  // --- 1. CẬP NHẬT HÀM LẤY DỮ LIỆU (Có kiểm tra lịch sử) ---
+  // --- 1. HÀM LẤY DỮ LIỆU (Đã xóa log rác) ---
   Future<void> _fetchData() async {
     final studentService = StudentService();
     final activityService = ActivityService();
 
-    // A. LẤY THÔNG TIN TỪ BỘ NHỚ MÁY (Hiển thị ngay lập tức)
-    // Dữ liệu này đã được lưu khi Đăng nhập thành công
+    // A. LẤY THÔNG TIN TỪ BỘ NHỚ MÁY
     final localInfo = await Utils.getUserInfo();
 
-    // Tạo một StudentModel tạm từ dữ liệu trong máy
     final localStudent = StudentModel(
       hoTen: localInfo['name'],
       mssv: localInfo['mssv'],
       lop: localInfo['lop'],
-      diemRenLuyen: 0, // Tạm thời để 0, API sẽ cập nhật sau
+      diemRenLuyen: 0,
     );
 
-    // Cập nhật giao diện ngay để người dùng không thấy "---"
     if (mounted) {
       setState(() {
         _student = localStudent;
@@ -49,7 +50,7 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
     }
 
     try {
-      // B. SAU ĐÓ GỌI API ĐỂ CẬP NHẬT MỚI NHẤT (Điểm rèn luyện, Hoạt động...)
+      // B. GỌI API CẬP NHẬT
       final results = await Future.wait([
         studentService.getStudentInfo(),
         activityService.getActivities(),
@@ -58,24 +59,25 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
 
       if (mounted) {
         setState(() {
-          // 1. Cập nhật lại Student nếu API trả về thành công (để lấy điểm rèn luyện mới nhất)
+          // 1. Cập nhật Student
           final studentRes = results[0] as dynamic;
           if (studentRes.isSuccess && studentRes.data != null) {
             _student = studentRes.data;
           }
 
-          // 2. Xử lý danh sách hoạt động
+          // 2. Xử lý danh sách hoạt động và khớp trạng thái đăng ký
           final activityRes = results[1] as dynamic;
           final historyRes = results[2] as dynamic;
 
           if (activityRes.isSuccess) {
             List<ActivityModel> allActivities = activityRes.data ?? [];
 
-            // So sánh lịch sử để đánh dấu "Đã đăng ký"
+            // Logic so sánh: Nếu có trong lịch sử thì đánh dấu là đã đăng ký
             if (historyRes.isSuccess && historyRes.data != null) {
               List<ActivityModel> historyList = historyRes.data!;
-              // Lấy danh sách ID các hoạt động đã tham gia
-              Set<int> registeredIds = historyList.map((e) => e.id ?? -1).toSet();
+
+              // Lấy danh sách ID Hoạt động từ lịch sử
+              Set<int> registeredIds = historyList.map((e) => e.hoatDongId ?? -1).toSet();
 
               for (var act in allActivities) {
                 if (registeredIds.contains(act.id)) {
@@ -90,78 +92,12 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
         });
       }
     } catch (e) {
-      print("Lỗi fetch data: $e");
+      // Chỉ giữ lại log lỗi quan trọng nếu cần
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  // --- 2. HÀM XỬ LÝ KHI BẤM VÀO HOẠT ĐỘNG ---
-  void _onActivityTap(ActivityModel activity) {
-    if (activity.isRegistered) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Bạn đã đăng ký tham gia hoạt động này rồi!")),
-      );
-      return;
-    }
-
-    // Hiện hộp thoại xác nhận
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("Xác nhận đăng ký"),
-        content: Text("Bạn có muốn đăng ký tham gia:\n'${activity.tenHoatDong}'?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text("Hủy", style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(ctx).pop(); // Đóng dialog
-              _processRegistration(activity); // Gọi API
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
-            child: const Text("Đăng ký ngay", style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // --- 3. HÀM GỌI API ĐĂNG KÝ ---
-  Future<void> _processRegistration(ActivityModel activity) async {
-    // Hiện loading
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => const Center(child: CircularProgressIndicator()),
-    );
-
-    final service = ActivityService();
-    // Gọi Service đăng ký (ID không được null)
-    final response = await service.registerActivity(activity.id!);
-
-    // Tắt loading
-    if (mounted) Navigator.of(context).pop();
-
-    if (response.isSuccess) {
-      // Cập nhật giao diện: Đổi trạng thái thành Đã ĐK ngay lập tức
-      setState(() {
-        activity.isRegistered = true;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("✅ Đăng ký thành công!"), backgroundColor: Colors.green),
-      );
-    } else {
-      // Hiện lỗi
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("❌ ${response.message}"), backgroundColor: Colors.red),
-      );
-    }
-  }
-
-  // Hàm xếp loại (Giữ nguyên)
+  // Hàm xếp loại
   String getXepLoai(int diem) {
     if (diem >= 90) return "Xuất Sắc";
     if (diem >= 80) return "Tốt";
@@ -200,7 +136,7 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
     );
   }
 
-  // ... (Hàm _buildHeader giữ nguyên) ...
+  // Header thông tin sinh viên
   Widget _buildHeader() {
     String tenHienThi = _student?.hoTen ?? "Sinh viên";
     String mssvHienThi = _student?.mssv ?? "---";
@@ -338,7 +274,7 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
     );
   }
 
-  // ... (Hàm _buildQuickMenu giữ nguyên) ...
+  // Menu tiện ích
   Widget _buildQuickMenu() {
     return Padding(
       padding: const EdgeInsets.only(top: 50, left: 20, right: 20),
@@ -350,10 +286,22 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildMenuItem(Icons.app_registration, "Đăng ký\nHoạt động", Colors.blue),
-              _buildMenuItem(Icons.history, "Lịch sử\nTham gia", Colors.orange),
-              _buildMenuItem(Icons.qr_code_scanner, "Quét mã\nĐiểm danh", Colors.purple),
-              _buildMenuItem(Icons.school, "Kết quả\nHọc tập", Colors.green),
+              _buildMenuItem(Icons.app_registration, "Đăng ký\nHoạt động", Colors.blue, () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const AllActivitiesScreen()));
+              }),
+
+              _buildMenuItem(Icons.history, "Lịch sử\nTham gia", Colors.orange, () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const CheckInHistoryScreen()));
+              }),
+
+              _buildMenuItem(Icons.qr_code_scanner, "Quét mã\nĐiểm danh", Colors.purple, () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const CheckInScreen()));
+              }),
+
+              // Nút này tạm thời ẩn hoặc để trống nếu chưa làm ScoreScreen
+              _buildMenuItem(Icons.school, "Kết quả\nHọc tập", Colors.green, () {
+                // Navigator.push(context, MaterialPageRoute(builder: (context) => const ScoreScreen()));
+              }),
             ],
           ),
         ],
@@ -361,21 +309,28 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
     );
   }
 
-  Widget _buildMenuItem(IconData icon, String title, Color color) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(15)),
-          child: Icon(icon, color: color, size: 28),
-        ),
-        const SizedBox(height: 8),
-        Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: Colors.black87)),
-      ],
+  Widget _buildMenuItem(IconData icon, String title, Color color, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(15),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(15)
+            ),
+            child: Icon(icon, color: color, size: 28),
+          ),
+          const SizedBox(height: 8),
+          Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: Colors.black87)),
+        ],
+      ),
     );
   }
 
-  // --- 4. SỬA DANH SÁCH ĐỂ BẮT SỰ KIỆN TAP ---
+  // Danh sách hoạt động (Chuyển sang trang chi tiết khi bấm)
   Widget _buildRecentActivities() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -386,7 +341,12 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text("Hoạt động sắp tới", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              TextButton(onPressed: () {}, child: const Text("Xem tất cả"))
+              TextButton(
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const AllActivitiesScreen()));
+                  },
+                  child: const Text("Xem tất cả")
+              )
             ],
           ),
 
@@ -400,12 +360,21 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
               ),
             )
           else
-          // Bọc item trong GestureDetector để bắt sự kiện Tap
             ..._activities.map((act) => GestureDetector(
-              onTap: () => _onActivityTap(act), // Gọi hàm xử lý khi bấm
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ActivityDetail(activity: act),
+                  ),
+                ).then((_) {
+                  // Cập nhật lại dữ liệu khi quay về từ trang chi tiết
+                  _fetchData();
+                });
+              },
               child: _buildActivityItem(
                 act.tenHoatDong ?? "Hoạt động không tên",
-                act.thoiGianBatDau ?? "2025-01-01",
+                act.thoiGianBatDau ?? "--/--/----",
                 act.diaDiem ?? "Chưa cập nhật",
                 act.isRegistered,
               ),
@@ -417,7 +386,6 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
     );
   }
 
-  // ... (Hàm _buildActivityItem giữ nguyên logic UI) ...
   Widget _buildActivityItem(String title, String dateRaw, String location, bool isRegistered) {
     String day = "01";
     String month = "01";
