@@ -45,7 +45,7 @@ class AuthRepository {
   }
 
   // 2. Xử lý Đăng nhập (Trả về Token dạng String)
-  Future<ApiResponse<String>> login(String username, String password) async {
+  Future<ApiResponse<dynamic>> login(String username, String password) async {
     final url = Uri.parse('$baseUrl/login');
 
     try {
@@ -67,9 +67,9 @@ class AuthRepository {
 
         // Lưu các thông tin phụ để hiện ra màn hình chính
         // Dùng ?? "" để tránh lỗi nếu dữ liệu bị null
-        await prefs.setString('mssv', data['mssv'] ?? "");   // sửa 'MSSV' -> 'mssv'
-        await prefs.setString('hoten', data['hoTen'] ?? "Sinh viên"); // sửa 'HoTen' -> 'hoTen'
-        await prefs.setString('lop', data['lop'] ?? "");     // sửa 'Lop' -> 'lop'
+        await prefs.setString('mssv', data['mssv'] ?? "");
+        await prefs.setString('hoten', data['hoTen'] ?? "Sinh viên");
+        await prefs.setString('lop', data['lop'] ?? "");
         await prefs.setString('khoa', data['khoa'] ?? "");
         await prefs.setInt('diemRL', data['diemRL'] ?? 0);
         return ApiResponse.success(token, message: "Đăng nhập thành công");

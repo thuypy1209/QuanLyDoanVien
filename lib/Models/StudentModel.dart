@@ -15,15 +15,14 @@ class StudentModel {
     this.diemRenLuyen,
   });
 
-  // Hàm chuyển từ JSON sang Object
   factory StudentModel.fromJson(Map<String, dynamic> json) {
     return StudentModel(
-      mssv: json['mssv'],
-      hoTen: json['hoTen'],
-      lop: json['lop'],
-      khoa: json['khoa'],
-      email: json['email'],
-      diemRenLuyen: json['diemRenLuyenTichLuy'], // Chú ý tên trường phải khớp API trả về
+      mssv: json['mssv'] ?? json['MSSV'] ?? "",
+      hoTen: json['hoTen'] ?? json['HoTen'] ?? "",
+      lop: json['lop'] ?? json['Lop'] ?? "---",
+      khoa: json['khoa'] ?? json['Khoa'] ?? "",
+      email: json['email'] ?? json['Email'] ?? "",
+      diemRenLuyen: json['diemRenLuyenTichLuy'] ?? 0,
     );
   }
 }

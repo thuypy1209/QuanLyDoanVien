@@ -15,7 +15,7 @@ class ProductModel{
       id: json['id'],
       name: json['name'],
       price: json['price'] == null ? 0: double.parse(json['price'].toString()),
-      imageUrl: json['imageUrl'] ?? '', //de hinh default
+      imageUrl: json['imageUrl'] ?? '',
     );
   }
 

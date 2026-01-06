@@ -1,12 +1,12 @@
 class ActivityModel {
   int? id;
   String? tenHoatDong;
-  String? moTa;           // Mới
-  String? thoiGianBatDau; // Mới (Thay cho thoiGian cũ)
-  String? thoiGianKetThuc;// Mới
+  String? moTa;
+  String? thoiGianBatDau;
+  String? thoiGianKetThuc;
   String? diaDiem;
-  int? diemCong;          // Mới
-  String? trangThai;      // Mới
+  int? diemCong;
+  String? trangThai;
   bool isRegistered;
 
   ActivityModel({
@@ -26,7 +26,7 @@ class ActivityModel {
       id: json['id'],
       tenHoatDong: json['tenHoatDong'],
       moTa: json['moTa'],
-      // JSON trả về DateTime dạng chuỗi ISO 8601
+
       thoiGianBatDau: json['thoiGianBatDau'],
       thoiGianKetThuc: json['thoiGianKetThuc'],
       diaDiem: json['diaDiem'],

@@ -4,11 +4,9 @@ import '../Models/StudentModel.dart';
 
 class StudentService {
   late StudentRepository studentRepository;
-
   StudentService() {
     this.studentRepository = StudentRepository();
   }
-
   Future<ApiResponse<StudentModel>> getStudentInfo() async {
     return await studentRepository.getStudentInfo();
   }

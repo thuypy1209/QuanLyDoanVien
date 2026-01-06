@@ -8,7 +8,6 @@ class AuthService {
   AuthService() {
     this.authRepository = AuthRepository();
   }
-
   // Hàm Đăng ký (Gọi từ Repository)
   Future<ApiResponse<bool>> register({
     required String mssv,
@@ -27,9 +26,8 @@ class AuthService {
       lop: lop,
     );
   }
-
   // Hàm Đăng nhập (Gọi từ Repository)
-  Future<ApiResponse<String>> login(String username, String password) async {
+  Future<ApiResponse<dynamic>> login(String username, String password) async {
     return await authRepository.login(username, password);
   }
 }
