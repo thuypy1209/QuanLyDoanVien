@@ -48,45 +48,46 @@ I. Cài đặt ứng dụng di động (Frontend)
 
 Clone dự án:
 
-Bash
+```bash
 
 git clone https://github.com/thuypy1209/quanlidoanvien.git
-
 cd quanlidoanvien
 
-Cài đặt thư viện:
+```
+2. Cài đặt thư viện:
 
-Bash
+```bash
 
 flutter pub get
-
-Cấu hình API:
+```
+3. Cấu hình API:
 
 Chỉnh sửa địa chỉ IP Server trong file lib/Services/AuthService.dart (hoặc các file Service tương ứng) để trỏ về máy local của bạn.
 
-Chạy ứng dụng:
+4. Chạy ứng dụng:
 
-Bash
+```bash
 
 flutter run
 
+```
 II. Cài đặt hệ thống API & Database (Backend)
 
-Clone dự án:
+1. Clone dự án:
 
-Bash
+```bash
 
 git clone https://github.com/thuypy1209/DoanVienAPI.git
-
 cd DoanVienAPI
 
-Cấu hình chuỗi kết nối:
+```
+2. Cấu hình chuỗi kết nối:
 
 Mở appsettings.json và cập nhật thông tin SQL Server tại mục DefaultConnection.
 
-Khởi tạo Cơ sở dữ liệu:
+3. Khởi tạo Cơ sở dữ liệu:
 
-Bash
+```bash
 
 Xóa thư mục Migrations cũ nếu có
 
@@ -94,12 +95,14 @@ dotnet ef migrations add InitialCreate
 
 dotnet ef database update
 
-Chạy API:
+```
+4. Chạy API:
 
-Bash
+```bash
 
 dotnet run --url "http://0.0.0.0:5000"
 
+```
 A few resources to get you started if this is your first Flutter project:
 
 - [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
