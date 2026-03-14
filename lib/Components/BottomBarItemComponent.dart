@@ -28,7 +28,6 @@ class BottomBarItemComponent extends StatelessWidget{
         backgroundColor: Colors.green,
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home),label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.add_card),label: "Product"),
           BottomNavigationBarItem(icon: Icon(Icons.chat),label: "Chat"),
         ]);
   }

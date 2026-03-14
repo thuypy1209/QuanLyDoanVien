@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'DoanVienScreen.dart'; // Đây là nội dung Tab 1
 import 'CheckInScreen.dart';      // Đây là nội dung Tab 2
-import 'AccountScreen.dart';      // Đây là nội dung Tab 3
+import 'ChatScreen.dart';// Đây là nội dung Tab 3
+import 'AccountScreen.dart';// Đây là nội dung Tab 4
 
-// Đổi tên class từ MainScreen -> HomeScreen
+import 'package:flutter/material.dart';
+
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -17,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _pages = [
     const DoanVienScreen(),
     const CheckInScreen(),
+    const ChatScreen(),
     const AccountScreen(),
   ];
 
@@ -43,6 +47,10 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.qr_code_scanner),
             label: "Check-in",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat),
+            label: "Chat",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),

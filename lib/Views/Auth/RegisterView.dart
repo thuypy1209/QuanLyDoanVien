@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../Components/TextFieldComponent.dart';
-import '../../Services/AuthService.dart';
+import 'package:quanlidoanvien/Components/TextFieldComponent.dart';
+import 'package:quanlidoanvien/Services/AuthService.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});

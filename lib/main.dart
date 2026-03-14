@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 void main() {
   runApp(
     MaterialApp(
+      debugShowCheckedModeBanner: false,
       navigatorKey: Utils.navigatorKey,
       title: "My app",
       initialRoute: '/',

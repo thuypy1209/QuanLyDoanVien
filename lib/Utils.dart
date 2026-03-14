@@ -1,31 +1,90 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-class Utils{
-  static  GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-  static String userName = "";
+import 'package:jwt_decoder/jwt_decoder.dart';
+
+class Utils {
+  static GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  static String baseUrl = 'http://10.0.2.2:5000';
+
   static int selectIndex = 0;
-  static String baseUrl = 'http://10.0.2.2:9093';
-  static  String productSlide = '/api/Product/get-slide';
-  static  String productAllProduct = '/api/Product/get-all-product';
-  static  String getStudent = '/api/Product/get-student';
-  // 1. Hàm LƯU Token (Dùng khi Đăng nhập thành công)
+  static String userName = "";
+
+  static String _getValue(Map<String, dynamic> json, List<String> keys, {String defaultValue = "..."}) {
+    for (var key in keys) {
+      if (json[key] != null) return json[key].toString();
+    }
+    return defaultValue;
+  }
+
   static Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('accessToken', token);
-    print("Đã lưu token vào bộ nhớ máy!");
+
+    try {
+      Map<String, dynamic> decoded = JwtDecoder.decode(token);
+
+      String mssv = _getValue(decoded, ['MSSV', 'mssv', 'code']);
+      String lop = _getValue(decoded, ['Lop', 'lop', 'classId']);
+      String hoTen = _getValue(decoded, ['Name', 'unique_name', 'name', 'hoTen'], defaultValue: "Sinh viên");
+      String email = _getValue(decoded, ['Email', 'email', 'emailaddress'], defaultValue: "Chưa cập nhật");
+
+      await prefs.setString('mssv', mssv);
+      await prefs.setString('name', hoTen);
+      await prefs.setString('lop', lop);
+      await prefs.setString('email', email);
+
+      userName = hoTen;
+    } catch (e) {
+      print("Lỗi giải mã: $e");
+    }
   }
 
-  // 2. Hàm LẤY Token (Dùng khi mở App để kiểm tra)
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('accessToken'); // Trả về null nếu chưa có
+    return prefs.getString('accessToken');
   }
 
-  // 3. Hàm XÓA Token (Dùng khi Đăng xuất)
   static Future<void> removeToken() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('accessToken');
-    print("Đã xóa token (Đăng xuất)!");
+    await prefs.clear();
+    selectIndex = 0;
   }
 
+  static Future<Map<String, String>> getUserInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    String? userInfoStr = prefs.getString('user_info');
+    String avatarUrl = "";
+
+    if (userInfoStr != null) {
+      try {
+        Map<String, dynamic> userInfo = jsonDecode(userInfoStr);
+        avatarUrl = userInfo['avatar'] ?? "";
+      } catch (_) {}
+    }
+
+    return {
+      'mssv': prefs.getString('mssv') ?? "...",
+      'name': prefs.getString('name') ?? "...",
+      'lop': prefs.getString('lop') ?? "...",
+      'email': prefs.getString('email') ?? "...",
+      'avatar': avatarUrl,
+    };
+  }
+
+  static Future<void> updateAvatarUrl(String newUrl) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userInfoStr = prefs.getString('user_info');
+
+    Map<String, dynamic> userInfo = {};
+    if (userInfoStr != null) {
+      try {
+        userInfo = jsonDecode(userInfoStr);
+      } catch (_) {}
+    }
+
+    userInfo['avatar'] = newUrl;
+    await prefs.setString('user_info', jsonEncode(userInfo));
+  }
 }

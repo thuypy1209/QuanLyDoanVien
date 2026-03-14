@@ -1,24 +1,22 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:quanlidoanvien/Utils.dart'; // Import Utils để lấy Token
-import '../Models/ActivityModel.dart';      // Import Model
-import 'ApiResponse.dart';                  // Import Wrapper phản hồi
+import 'package:quanlidoanvien/Utils.dart';
+import 'package:quanlidoanvien/Models/ActivityModel.dart';
+import 'ApiResponse.dart';
 
 class ActivityRepository {
-  // Đường dẫn API (Lưu ý: Android Emulator dùng 10.0.2.2)
+
   static const String baseUrl = 'http://10.0.2.2:5000/api/HoatDong';
 
   // Hàm lấy danh sách hoạt động
   Future<ApiResponse<List<ActivityModel>>> getActivities() async {
     try {
-      // 1. Lấy Token từ Shared Preferences
-      String? token = await Utils.getToken();
 
+      String? token = await Utils.getToken();
       if (token == null) {
         return ApiResponse.error("Chưa đăng nhập hoặc phiên hết hạn.");
       }
 
-      // 2. Gọi API (Gửi kèm Token trong Header)
       final response = await http.get(
         Uri.parse(baseUrl),
         headers: {
@@ -27,13 +25,11 @@ class ActivityRepository {
         },
       );
 
-      // 3. Xử lý kết quả trả về
+
       if (response.statusCode == 200) {
-        // API trả về một mảng JSON: [{}, {}, ...]
+
         final List<dynamic> jsonData = jsonDecode(response.body);
 
-        // Chuyển đổi List<dynamic> thành List<ActivityModel>
-        // Hàm map sẽ chạy vòng lặp qua từng phần tử và gọi ActivityModel.fromJson
         List<ActivityModel> activities = jsonData
             .map((jsonItem) => ActivityModel.fromJson(jsonItem))
             .toList();
@@ -46,7 +42,63 @@ class ActivityRepository {
         return ApiResponse.error("Lỗi Server: ${response.statusCode} - ${response.body}");
       }
     } catch (e) {
-      // Bắt lỗi mạng, lỗi parse JSON...
+      return ApiResponse.error("Lỗi kết nối: $e");
+    }
+  }
+  Future<ApiResponse<bool>> registerActivity(int activityId) async {
+    try {
+      String? token = await Utils.getToken();
+
+      final url = Uri.parse('$baseUrl/dangky/$activityId');
+
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return ApiResponse.success(true, message: "Đăng ký thành công!");
+      } else {
+
+        String msg = response.body;
+        try {
+
+          final errJson = jsonDecode(response.body);
+          msg = errJson['message'] ?? response.body;
+        } catch (_) {}
+
+        return ApiResponse.error(msg);
+      }
+    } catch (e) {
+      return ApiResponse.error("Lỗi kết nối: $e");
+    }
+  }
+
+  Future<ApiResponse<List<ActivityModel>>> getHistory() async {
+    try {
+      String? token = await Utils.getToken();
+      // Gọi API: GET api/HoatDong/lich-su
+      final url = Uri.parse('$baseUrl/lich-su');
+
+      final response = await http.get(
+        url,
+        headers: {"Authorization": "Bearer $token"},
+      );
+
+      if (response.statusCode == 200) {
+        print("HISTORY JSON: ${response.body}");
+        final List<dynamic> jsonData = jsonDecode(response.body);
+        List<ActivityModel> activities = jsonData
+            .map((item) => ActivityModel.fromJson(item))
+            .toList();
+        return ApiResponse.success(activities);
+      } else {
+        return ApiResponse.error("Lỗi tải lịch sử: ${response.statusCode}");
+      }
+    } catch (e) {
       return ApiResponse.error("Lỗi kết nối: $e");
     }
   }

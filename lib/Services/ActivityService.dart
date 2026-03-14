@@ -5,13 +5,16 @@ import '../Repository/ApiResponse.dart';
 class ActivityService {
   late ActivityRepository activityRepository;
 
-  // Constructor: Khởi tạo Repository
   ActivityService() {
     this.activityRepository = ActivityRepository();
   }
-
-  // Hàm lấy danh sách hoạt động
   Future<ApiResponse<List<ActivityModel>>> getActivities() async {
     return await activityRepository.getActivities();
+  }
+  Future<ApiResponse<bool>> registerActivity(int activityId) async {
+    return await activityRepository.registerActivity(activityId);
+  }
+  Future<ApiResponse<List<ActivityModel>>> getHistory() async {
+    return await activityRepository.getHistory();
   }
 }

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
 class TextFieldComponent extends StatelessWidget {
-  // Các tham số cần truyền vào
+
   final TextEditingController controller;
   final String hintText;
   final IconData icon;
-  final bool isPassword;      // Có phải là ô mật khẩu không?
-  final bool obscureText;     // Trạng thái ẩn/hiện (chỉ dùng nếu isPassword = true)
-  final VoidCallback? onTogglePassword; // Hàm xử lý khi bấm nút mắt
+  final bool isPassword;
+  final bool obscureText;
+  final VoidCallback? onTogglePassword;
   final TextCapitalization capitalization;
 
-  // Màu chủ đạo (Xanh HUTECH)
+  // Màu chủ đạo
   final Color primaryColor = const Color(0xFF0D47A1);
 
   const TextFieldComponent({
@@ -34,10 +34,10 @@ class TextFieldComponent extends StatelessWidget {
         textCapitalization: capitalization,
         decoration: InputDecoration(
           hintText: hintText,
-          // Icon đầu dòng
+
           prefixIcon: Icon(icon, color: primaryColor),
 
-          // Nút mắt ẩn/hiện (Chỉ hiện khi là ô mật khẩu)
+
           suffixIcon: isPassword
               ? IconButton(
             icon: Icon(
@@ -48,7 +48,7 @@ class TextFieldComponent extends StatelessWidget {
           )
               : null,
 
-          // Trang trí viền bo tròn
+
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),
           ),
