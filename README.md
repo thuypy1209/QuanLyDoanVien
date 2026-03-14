@@ -1,51 +1,104 @@
-# Quản Lý Đoàn Viên (Union Management System)
--Dự án xây dựng ứng dụng di động hỗ trợ quản lý thông tin đoàn viên, theo dõi hoạt động phong trào và quản lý sổ đoàn điện tử. Được phát triển bằng Flutter nhằm mang lại trải nghiệm mượt mà trên cả Android.
+# 📱 Quản Lý Đoàn Viên (Union Management System)
 
-## Tính năng chính
-Quản lý hồ sơ: 
+Giải pháp chuyển đổi số quản lý đoàn viên và hoạt động phong trào trên nền tảng di động.
 
-Điểm danh & Hoạt động: 
+## 📋 Giới thiệu dự án
 
+Dự án được xây dựng nhằm hỗ trợ tổ chức Đoàn trong việc số hóa hồ sơ, quản lý sổ đoàn điện tử và theo dõi các hoạt động phong trào một cách minh bạch, hiệu quả.
 
-Tin tức & Thông báo: 
+Ứng dụng mang lại trải nghiệm mượt mà, đồng bộ dữ liệu thời gian thực giữa thiết bị di động và máy chủ.
 
+### ✨ Tính năng chính
 
-### Công nghệ sử dụng
-Frontend: Flutter & Dart
+Nhóm tính năng, Chi tiết:
 
-Backend : ASP.NET Core
+👤 Quản lý hồ sơ: Đăng ký/Đăng nhập, cập nhật thông tin cá nhân, quản lý sổ đoàn điện tử.
 
-Database: SQL Server
+📅 Hoạt động: Xem danh sách hoạt động, đăng ký tham gia và thực hiện điểm danh.
 
-Authentication: JWT (JSON Web Token) để xác thực người dùng
+📊 Thống kê: Theo dõi biểu đồ tham gia hoạt động trực quan bằng fl_chart.
 
-## Getting Started
+🔔 Thông báo: Cập nhật tin tức phong trào và các thông báo mới nhất từ Đoàn cấp trên.
 
-I.Để chạy dự án này ở môi trường local, bạn cần thực hiện các bước sau:
-1.Clone dự án:
-    git clone https://github.com/thuypy1209/quanlidoanvien.git
-    cd quanlidoanvien
+#### 🛠 Công nghệ sử dụng
 
-2.Cài đặt các dependencies:
-    flutter pub get
+Frontend (Mobile App)
 
-3.Chạy ứng dụng:
-    flutter run
+- Framework: Flutter & Dart.
 
-II.Add database local:
-1.Clone database & API:
-    git clone https://github.com/thuypy1209/DoanVienAPI.git
-    cd DoanVienAPI
+- State Management: Flutter BLoC.
 
-2.Khởi tạo Cơ sở dữ liệu
--Thực hiện xóa thủ công: Xóa toàn bộ thư mục có tên là Migrations
--Sau khi đã xóa cả Database và các file Migration cũ, chạy chuỗi lệnh sau
-    dotnet ef migrations add InitialCreate
+- UI Libraries: curved_navigation_bar (Thanh điều hướng), fl_chart (Biểu đồ), cupertino_icons.
 
--Tạo bản thiết kế (Migration) đầu tiên chứa bảng HoatDong mới
-    dotnet ef migrations add InitialCreate
-    dotnet ef database update
+- Security: Lưu trữ JWT Token qua shared_preferences.
 
+Backend (API)
+
+- Framework: ASP.NET Core với kiến trúc RESTful API.
+
+- Database: Microsoft SQL Server.
+
+- Authentication: JWT (JSON Web Token).
+
+- Real-time: SignalR hỗ trợ các tác vụ thời gian thực.
+
+##### 🚀 Hướng dẫn cài đặt (Getting Started)
+
+I. Cài đặt ứng dụng di động (Frontend)
+
+Clone dự án:
+
+Bash
+
+git clone https://github.com/thuypy1209/quanlidoanvien.git
+
+cd quanlidoanvien
+
+Cài đặt thư viện:
+
+Bash
+
+flutter pub get
+
+Cấu hình API:
+
+Chỉnh sửa địa chỉ IP Server trong file lib/Services/AuthService.dart (hoặc các file Service tương ứng) để trỏ về máy local của bạn.
+
+Chạy ứng dụng:
+
+Bash
+
+flutter run
+
+II. Cài đặt hệ thống API & Database (Backend)
+
+Clone dự án:
+
+Bash
+
+git clone https://github.com/thuypy1209/DoanVienAPI.git
+
+cd DoanVienAPI
+
+Cấu hình chuỗi kết nối:
+
+Mở appsettings.json và cập nhật thông tin SQL Server tại mục DefaultConnection.
+
+Khởi tạo Cơ sở dữ liệu:
+
+Bash
+
+Xóa thư mục Migrations cũ nếu có
+
+dotnet ef migrations add InitialCreate
+
+dotnet ef database update
+
+Chạy API:
+
+Bash
+
+dotnet run --url "http://0.0.0.0:5000"
 
 A few resources to get you started if this is your first Flutter project:
 
