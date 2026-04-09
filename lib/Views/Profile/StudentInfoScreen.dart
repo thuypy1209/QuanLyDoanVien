@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:quanlidoanvien/Services/StudentService.dart'; // Import Service
 import 'package:quanlidoanvien/Models/StudentModel.dart';
 import 'package:quanlidoanvien/Utils.dart';
+import '../../Services/UploadService.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class StudentInfoScreen extends StatefulWidget {
   const StudentInfoScreen({super.key});
@@ -13,6 +16,9 @@ class StudentInfoScreen extends StatefulWidget {
 class _StudentInfoScreenState extends State<StudentInfoScreen> {
   bool _isLoading = true;
   StudentModel? _student;
+  File? _imageFile;
+  final ImagePicker _picker = ImagePicker();
+  bool _isUploading = false;
 
   @override
   void initState() {
@@ -51,6 +57,46 @@ class _StudentInfoScreenState extends State<StudentInfoScreen> {
       if (mounted) setState(() => _isLoading = false);
     }
   }
+  // Hàm chọn ảnh từ thư viện
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+      // Gọi API Upload ngay sau khi chọn ảnh
+      _uploadAvatar();
+    }
+  }
+
+  // Hàm upload ảnh lên Server
+  Future<void> _uploadAvatar() async {
+    if (_imageFile == null) return;
+
+    setState(() => _isUploading = true);
+
+    // Gọi UploadService. Nhớ chắc chắn Cổng Backend là 5000 hay cổng khác nha
+    bool success = await UploadService.uploadImage("api/sinhvien/upload-avatar", _imageFile!);
+
+    setState(() => _isUploading = false);
+
+    if (success) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Cập nhật ảnh thành công!", style: TextStyle(color: Colors.white)), backgroundColor: Colors.green),
+        );
+      }
+      // Load lại data để lấy link ảnh mới từ DB (nếu cần thiết)
+      // _fetchStudentData();
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Upload thất bại! Vui lòng thử lại.", style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,39 +127,74 @@ class _StudentInfoScreenState extends State<StudentInfoScreen> {
               ),
               child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.white,
-                    child: CircleAvatar(
-                      radius: 47,
-                      backgroundColor: Colors.blue[100],
-                      child: const Icon(Icons.person, size: 60, color: Color(0xFF3D5AFE)),
-                    ),
+                GestureDetector(
+                onTap: _pickImage, // Bấm để chọn ảnh
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                      CircleAvatar(
+                        radius: 52, // Viền trắng bên ngoài
+                        backgroundColor: Colors.white,
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.blue[100],
+                          // Load ảnh: Ưu tiên ảnh vừa chọn (FileImage), sau đó là ảnh từ Server (NetworkImage)
+                          backgroundImage: _imageFile != null
+                              ? FileImage(_imageFile!)
+                              : (_student?.avatarUrl != null && _student!.avatarUrl!.isNotEmpty)
+                              ? NetworkImage("${Utils.baseUrl}${_student!.avatarUrl}")
+                              : null,
+                          // Hiện icon nếu không có bất kỳ ảnh nào
+                          child: (_imageFile == null && (_student?.avatarUrl == null || _student!.avatarUrl!.isEmpty))
+                              ? const Icon(Icons.person, size: 60, color: Color(0xFF3D5AFE))
+                              : null,
+                        ),
+                      ),
+                      // Hiển thị vòng xoay đang tải khi upload
+                      if (_isUploading)
+                        const CircularProgressIndicator(color: Colors.white),
+
+                      // Icon máy ảnh nhỏ ở góc báo hiệu có thể đổi ảnh
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: const BoxDecoration(
+                            color: Colors.orange,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.camera_alt, color: Colors.white, size: 16),
+                        ),
+                      )
+                    ],
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    _student?.hoTen ?? "Sinh viên",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      _student?.mssv ?? "---",
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                  )
-                ],
+                ),
+            const SizedBox(height: 10),
+            Text(
+              _student?.hoTen ?? "Sinh viên",
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
             ),
+            const SizedBox(height: 5),
+
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                _student?.mssv ?? "---",
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            )
+            ],
+          ),
+        ),
 
             const SizedBox(height: 20),
 
