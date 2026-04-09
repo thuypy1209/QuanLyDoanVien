@@ -28,11 +28,13 @@ class Utils {
       String lop = _getValue(decoded, ['Lop', 'lop', 'classId']);
       String hoTen = _getValue(decoded, ['Name', 'unique_name', 'name', 'hoTen'], defaultValue: "Sinh viên");
       String email = _getValue(decoded, ['Email', 'email', 'emailaddress'], defaultValue: "Chưa cập nhật");
+      String avatarUrl = _getValue(decoded, ['Avatar', 'avatar', 'avatarUrl'], defaultValue: "");
 
       await prefs.setString('mssv', mssv);
       await prefs.setString('name', hoTen);
       await prefs.setString('lop', lop);
       await prefs.setString('email', email);
+      await prefs.setString('avatar', avatarUrl);
 
       userName = hoTen;
     } catch (e) {
@@ -56,6 +58,7 @@ class Utils {
 
     String? userInfoStr = prefs.getString('user_info');
     String avatarUrl = "";
+
 
     if (userInfoStr != null) {
       try {
@@ -86,5 +89,10 @@ class Utils {
 
     userInfo['avatar'] = newUrl;
     await prefs.setString('user_info', jsonEncode(userInfo));
+  }
+  static Future<String> getName() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Lấy tên đã lưu, nếu không có thì trả về "Sinh viên"
+    return prefs.getString('name') ?? "Sinh viên";
   }
 }
