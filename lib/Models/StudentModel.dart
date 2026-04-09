@@ -5,6 +5,7 @@ class StudentModel {
   String? khoa;
   String? email;
   int? diemRenLuyen;
+  String? avatarUrl;
 
   StudentModel({
     this.mssv,
@@ -13,6 +14,7 @@ class StudentModel {
     this.khoa,
     this.email,
     this.diemRenLuyen,
+    this.avatarUrl,
   });
 
   factory StudentModel.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class StudentModel {
       khoa: json['khoa'] ?? json['Khoa'] ?? "",
       email: json['email'] ?? json['Email'] ?? "",
       diemRenLuyen: json['diemRenLuyenTichLuy'] ?? 0,
+      avatarUrl: json['avatarUrl'] ?? json['AvatarUrl'],
     );
   }
 }
