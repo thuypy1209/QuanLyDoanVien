@@ -27,7 +27,11 @@ class ChatService {
         .build();
     _hubConnection!.on("ReceiveMessage", (List<dynamic>? arguments) {
       if (arguments != null && arguments.isNotEmpty && onMessageReceived != null) {
-        onMessageReceived!(arguments[0] as Map<String, dynamic>);
+        onMessageReceived!({
+          "user": arguments[0].toString(),
+          "message": arguments[1].toString(),
+          "time": DateTime.now().toString()
+        });
       }
     });
 
@@ -49,8 +53,13 @@ class ChatService {
   }
   Future<void> sendMessage(String content) async {
     if (isConnected) {
-
-      await _hubConnection!.invoke("SendMessage", args: [content]);
+      try {
+        final String fullName = await Utils.getName();
+        await _hubConnection!.invoke(
+            "SendMessage", args: [fullName, content]);
+      } catch (e) {
+        print("Lỗi: $e");
+      }
     }
   }
   void dispose() {

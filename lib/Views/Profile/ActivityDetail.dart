@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quanlidoanvien/Models/ActivityModel.dart';
 import 'package:quanlidoanvien/Services/ActivityService.dart';
+import 'package:quanlidoanvien/Utils.dart';
 
 class ActivityDetail extends StatefulWidget {
   final ActivityModel activity;
@@ -12,7 +13,7 @@ class ActivityDetail extends StatefulWidget {
 
 class _ActivityDetailState extends State<ActivityDetail> {
   bool _isRegistering = false;
-  bool _isRegistered = false;
+  late bool _isRegistered; // Dùng late cho chắc
 
   @override
   void initState() {
@@ -32,14 +33,18 @@ class _ActivityDetailState extends State<ActivityDetail> {
     if (response.data == true) {
       // Nếu data trả về true => Thành công
       setState(() => _isRegistered = true);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("✅ Đăng ký thành công!"), backgroundColor: Colors.green),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("✅ Đăng ký thành công!"), backgroundColor: Colors.green),
+        );
+      }
     } else {
       // Nếu thất bại => Hiện message lỗi từ ApiResponse
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("${response.message ?? 'Đăng ký thất bại'}"), backgroundColor: Colors.red),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response.message ?? 'Đăng ký thất bại'), backgroundColor: Colors.red),
+        );
+      }
     }
   }
 
@@ -49,7 +54,7 @@ class _ActivityDetailState extends State<ActivityDetail> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Chi tiết hoạt động"),
+        title: const Text("Chi tiết hoạt động", style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: const Color(0xFF0D47A1),
         foregroundColor: Colors.white,
       ),
@@ -60,12 +65,20 @@ class _ActivityDetailState extends State<ActivityDetail> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // 👇 2. SỬA LẠI KHÚC LOAD ẢNH Ở ĐÂY NÈ
                   Image.network(
-                    act.imageUrl ?? "https://via.placeholder.com/800x400",
+                    (act.imageUrl != null && act.imageUrl!.isNotEmpty)
+                        ? "${Utils.baseUrl}${act.imageUrl}" // Nối baseUrl vào
+                        : "https://via.placeholder.com/800x400?text=No+Image", // Link ảnh mặc định nếu DB không có
                     width: double.infinity,
                     height: 250,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(height: 250, color: Colors.grey[300]),
+                    // Nếu lỗi (ví dụ sai cổng, tắt server) thì hiện cục xám
+                    errorBuilder: (_, __, ___) => Container(
+                      height: 250,
+                      color: Colors.grey[300],
+                      child: const Center(child: Icon(Icons.broken_image, size: 50, color: Colors.grey)),
+                    ),
                   ),
 
                   Padding(
@@ -75,8 +88,8 @@ class _ActivityDetailState extends State<ActivityDetail> {
                       children: [
                         Text(act.tenHoatDong ?? "", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 15),
-                        _buildInfoRow(Icons.calendar_today, "Thời gian: ${act.thoiGianBatDau}"),
-                        _buildInfoRow(Icons.location_on, "Địa điểm: ${act.diaDiem}"),
+                        _buildInfoRow(Icons.calendar_today, "Thời gian: ${act.thoiGianBatDau ?? 'Chưa cập nhật'}"),
+                        _buildInfoRow(Icons.location_on, "Địa điểm: ${act.diaDiem ?? 'Chưa cập nhật'}"),
                         _buildInfoRow(Icons.star, "Điểm cộng: ${act.diemCong ?? 0} điểm"),
                         const Divider(height: 30),
                         const Text("Mô tả chi tiết:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -92,9 +105,11 @@ class _ActivityDetailState extends State<ActivityDetail> {
               ),
             ),
           ),
+
+          // Nút Đăng ký giữ nguyên, viết rất chuẩn rồi
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.white,
               boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -2))],
             ),
@@ -108,16 +123,17 @@ class _ActivityDetailState extends State<ActivityDetail> {
                   showDialog(
                     context: context,
                     builder: (ctx) => AlertDialog(
-                      title: const Text("Xác nhận"),
-                      content: const Text("Bạn có chắc chắn muốn đăng ký?"),
+                      title: const Text("Xác nhận", style: TextStyle(fontWeight: FontWeight.bold)),
+                      content: const Text("Bạn có chắc chắn muốn đăng ký tham gia hoạt động này không?"),
                       actions: [
-                        TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Hủy")),
+                        TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Hủy", style: TextStyle(color: Colors.grey))),
                         ElevatedButton(
                           onPressed: () {
                             Navigator.pop(ctx);
                             _handleRegister(); // Gọi hàm xử lý
                           },
-                          child: const Text("Đăng ký"),
+                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1)),
+                          child: const Text("Đăng ký", style: TextStyle(color: Colors.white)),
                         )
                       ],
                     ),
@@ -129,7 +145,7 @@ class _ActivityDetailState extends State<ActivityDetail> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
                 child: _isRegistering
-                    ? const CircularProgressIndicator(color: Colors.white)
+                    ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3))
                     : Text(
                   _isRegistered ? "ĐÃ ĐĂNG KÝ" : "ĐĂNG KÝ THAM GIA",
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -146,6 +162,7 @@ class _ActivityDetailState extends State<ActivityDetail> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, color: Colors.blue[800], size: 22),
           const SizedBox(width: 10),

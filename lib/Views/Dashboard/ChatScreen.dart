@@ -16,10 +16,12 @@ class _ChatScreenState extends State<ChatScreen> {
 
   List<Map<String, dynamic>> _messages = [];
   bool _isConnected = false;
+  String _myName = "";
 
   @override
   void initState() {
     super.initState();
+    _loadMyName();
     _setupChat();
   }
 
@@ -31,8 +33,8 @@ class _ChatScreenState extends State<ChatScreen> {
             'user': data['user'],
             'avatar': data['avatar'],
             'message': data['message'],
-            'time': data['timestamp'],
-            'isMe': data['user'] == Utils.userName
+            'time': data['time'],
+            'isMe': data['user'] == _myName
           });
         });
         _scrollToBottom();
@@ -45,7 +47,13 @@ class _ChatScreenState extends State<ChatScreen> {
 
     _chatService.initSignalR().catchError((e) => print("Lỗi kết nối Chat: $e"));
   }
-
+  Future<void> _loadMyName() async {
+    // Gọi hàm getName() mà ní đã thêm ở file Utils
+    String name = await Utils.getName();
+    setState(() {
+      _myName = name;
+    });
+  }
   void _handleSend() async {
     if (_controller.text.trim().isNotEmpty && _isConnected) {
       await _chatService.sendMessage(_controller.text.trim());

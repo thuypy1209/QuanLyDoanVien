@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quanlidoanvien/Services/ActivityService.dart';
 import 'package:quanlidoanvien/Models/ActivityModel.dart';
 import 'package:quanlidoanvien/Views/Profile/ActivityDetail.dart';
+import 'package:quanlidoanvien/Utils.dart';
 
 class AllActivitiesScreen extends StatefulWidget {
   const AllActivitiesScreen({super.key});
@@ -124,7 +125,9 @@ class _AllActivitiesScreenState extends State<AllActivitiesScreen> {
                     child: ClipRRect(
                       borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
                       child: Image.network(
-                        item.imageUrl ?? "https://via.placeholder.com/400x400",
+                          (item.imageUrl != null && item.imageUrl!.isNotEmpty)
+                              ? "${Utils.baseUrl}${item.imageUrl}"
+                              : "https://via.placeholder.com/400x400?text=No+Image",
                         width: double.infinity,
                         fit: BoxFit.cover,
                         errorBuilder: (ctx, err, stack) => Container(

@@ -162,7 +162,12 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
               CircleAvatar(
                 radius: 30,
                 backgroundColor: Colors.white,
-                child: Icon(Icons.person, size: 40, color: primaryColor),
+                backgroundImage: (_student?.avatarUrl != null && _student!.avatarUrl!.isNotEmpty)
+                    ? NetworkImage("${Utils.baseUrl}${_student!.avatarUrl}")
+                    : null,
+                child: (_student?.avatarUrl == null || _student!.avatarUrl!.isEmpty)
+                    ? Icon(Icons.person, size: 40, color: primaryColor)
+                    : null,
               ),
               const SizedBox(width: 15),
               Expanded(
@@ -184,7 +189,7 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha:0.2),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
@@ -214,7 +219,7 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha:0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 5),
                 ),
@@ -247,7 +252,7 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: getMauXepLoai(diemHienThi).withOpacity(0.1),
+                        color: getMauXepLoai(diemHienThi).withValues(alpha:0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -309,7 +314,7 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha:0.1),
                 borderRadius: BorderRadius.circular(15)
             ),
             child: Icon(icon, color: color, size: 28),
@@ -368,6 +373,7 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
                 act.thoiGianBatDau ?? "--/--/----",
                 act.diaDiem ?? "Chưa cập nhật",
                 act.isRegistered,
+                act.imageUrl,
               ),
             )).toList(),
 
@@ -376,8 +382,30 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
       ),
     );
   }
-
-  Widget _buildActivityItem(String title, String dateRaw, String location, bool isRegistered) {
+  Widget _buildFallbackDate(String day, String month) {
+    return Container(
+      width: 70,
+      height: 70,
+      decoration: BoxDecoration(
+          color: Colors.blue.withValues(alpha:0.1),
+          borderRadius: BorderRadius.circular(10)
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+              day,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue)
+          ),
+          Text(
+              "Th$month",
+              style: const TextStyle(fontSize: 12, color: Colors.blue)
+          ),
+        ],
+      ),
+    );
+  }
+  Widget _buildActivityItem(String title, String dateRaw, String location, bool isRegistered, String? imageUrl) {
     String day = "01";
     String month = "01";
 
@@ -392,20 +420,22 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
-        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.05), spreadRadius: 1, blurRadius: 5)],
+        border: Border.all(color: Colors.grey.withValues(alpha:0.1)),
+        boxShadow: [BoxShadow(color: Colors.grey.withValues(alpha:0.05), spreadRadius: 1, blurRadius: 5)],
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
-            child: Column(
-              children: [
-                Text(day, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue)),
-                Text("Th$month", style: const TextStyle(fontSize: 12, color: Colors.blue)),
-              ],
-            ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: (imageUrl != null && imageUrl.isNotEmpty)
+                ? Image.network(
+              "${Utils.baseUrl}$imageUrl",
+              width: 70,
+              height: 70,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => _buildFallbackDate(day, month), // Lỗi load ảnh thì hiện ngày
+            )
+                : _buildFallbackDate(day, month), // Không có ảnh thì hiện ngày
           ),
           const SizedBox(width: 15),
           Expanded(
@@ -418,7 +448,7 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
                   children: [
                     const Icon(Icons.location_on, size: 14, color: Colors.grey),
                     const SizedBox(width: 4),
-                    Text(location, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                    Expanded(child: Text(location, style: const TextStyle(fontSize: 12, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis)),
                   ],
                 ),
               ],
@@ -427,7 +457,7 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
           if (isRegistered)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
+              decoration: BoxDecoration(color: Colors.green.withValues(alpha:0.1), borderRadius: BorderRadius.circular(20)),
               child: const Text("Đã ĐK", style: TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.bold)),
             )
           else
@@ -435,5 +465,6 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
         ],
       ),
     );
+
   }
 }

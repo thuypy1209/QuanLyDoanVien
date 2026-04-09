@@ -38,7 +38,7 @@ class ActivityModel {
       diemCong: json['diemCong'],
       trangThai: json['trangThai'],
       isRegistered: false,
-      imageUrl: json['imageUrl'],
+      imageUrl: json['imageUrl']?? json['ImageUrl'],
     );
   }
 }
