@@ -1,9 +1,14 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:quanlidoanvien/main.dart';
+import 'package:quanlidoanvien/Views/Auth/WelcomeView.dart';
 
 void main() {
-  testWidgets('App smoke test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
-    expect(find.byType(MyApp), findsOneWidget);
+  testWidgets('WelcomeView smoke test', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: WelcomeView(),
+      ),
+    );
+    expect(find.byType(WelcomeView), findsOneWidget);
   });
 }
