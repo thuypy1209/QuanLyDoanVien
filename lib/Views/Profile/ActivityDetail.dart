@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quanlidoanvien/Components/AppBarComponent.dart';
 import 'package:quanlidoanvien/Models/ActivityModel.dart';
 import 'package:quanlidoanvien/Services/ActivityService.dart';
 import 'package:quanlidoanvien/Utils.dart';
@@ -53,11 +54,7 @@ class _ActivityDetailState extends State<ActivityDetail> {
     final act = widget.activity;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Chi tiết hoạt động", style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF0D47A1),
-        foregroundColor: Colors.white,
-      ),
+      appBar: const AppBarComponent(title: "Chi tiết hoạt động"),
       body: Column(
         children: [
           Expanded(

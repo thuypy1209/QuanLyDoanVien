@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quanlidoanvien/Components/AppBarComponent.dart';
 import 'package:quanlidoanvien/Utils.dart';
 
 class QRCodeScreen extends StatefulWidget {
@@ -36,11 +37,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
     final String qrUrl = '${Utils.baseUrl}/api/HoatDong/qr/${widget.activityId}';
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Mã QR Điểm danh"),
-        backgroundColor: const Color(0xFF0D47A1),
-        foregroundColor: Colors.white,
-      ),
+      appBar: const AppBarComponent(title: "Mã QR Điểm danh"),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

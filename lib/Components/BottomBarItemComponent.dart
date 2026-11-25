@@ -1,35 +1,30 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../Utils.dart';
+class BottomBarItemComponent {
+  static BottomNavigationBarItem create({
+    required IconData icon,
+    required String label,
+    IconData? activeIcon,
+    int badgeCount = 0,
+  }) {
+    Widget iconWidget = Icon(icon);
+    Widget activeIconWidget = Icon(activeIcon ?? icon);
 
-class BottomBarItemComponent extends StatelessWidget{
-  void clickItemBar(int value){
-    BuildContext globalContext = Utils.navigatorKey.currentContext!;
-    Utils.selectIndex = value;
-    print("select index= ${Utils.selectIndex}");
-    if(value == 0){
-      Navigator.pushNamed(globalContext, '/home');
+    if (badgeCount > 0) {
+      iconWidget = Badge(
+        label: Text('$badgeCount'),
+        child: iconWidget,
+      );
+      activeIconWidget = Badge(
+        label: Text('$badgeCount'),
+        child: activeIconWidget,
+      );
     }
-    if(value == 1){
-      Navigator.pushNamed(globalContext, '/product');
 
-    }
+    return BottomNavigationBarItem(
+      icon: iconWidget,
+      activeIcon: activeIconWidget,
+      label: label,
+    );
   }
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return BottomNavigationBar(
-        onTap: (value) {
-          return clickItemBar(value);
-        },
-        currentIndex: Utils.selectIndex,
-        selectedItemColor: Colors.orange,
-        backgroundColor: Colors.green,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home),label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.chat),label: "Chat"),
-        ]);
-  }
-
 }

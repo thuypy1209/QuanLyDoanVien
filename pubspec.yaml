@@ -49,6 +49,7 @@ dependencies:
   permission_handler: ^11.3.0
   image_picker: ^1.0.7
   flutter_launcher_icons: ^0.13.1
+  qr_flutter: ^4.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

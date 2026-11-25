@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:quanlidoanvien/Components/AppBarComponent.dart';
+import 'package:quanlidoanvien/Components/ButtonComponent.dart';
 
 import 'package:quanlidoanvien/Services/CheckInService.dart';
 import 'package:quanlidoanvien/Views/Screen/CheckInHistoryScreen.dart';
@@ -164,10 +166,9 @@ class _CheckInScreenState extends State<CheckInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Điểm danh QR"),
-        backgroundColor: const Color(0xFF0D47A1),
-        foregroundColor: Colors.white,
+      appBar: AppBarComponent(
+        title: "Điểm danh QR",
+        showBack: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.history),
@@ -189,32 +190,36 @@ class _CheckInScreenState extends State<CheckInScreen> {
               ),
               const SizedBox(height: 30),
 
-              _buildCustomButton(
+              ButtonComponent(
                 icon: Icons.camera_alt,
-                label: "QUÉT CAMERA",
+                text: "QUÉT CAMERA",
                 color: const Color(0xFF0D47A1),
-                isOutlined: false,
-                onTap: _requestCameraPermission,
+                width: 300,
+                height: 55,
+                onPressed: _requestCameraPermission,
               ),
 
               const SizedBox(height: 15),
 
-              _buildCustomButton(
+              ButtonComponent(
                 icon: Icons.image,
-                label: "CHỌN TỪ THƯ VIỆN",
+                text: "CHỌN TỪ THƯ VIỆN",
                 color: Colors.orange[800]!,
-                isOutlined: false,
-                onTap: _scanFromGallery,
+                width: 300,
+                height: 55,
+                onPressed: _scanFromGallery,
               ),
 
               const SizedBox(height: 15),
 
-              _buildCustomButton(
+              ButtonComponent(
                 icon: Icons.history,
-                label: "XEM LỊCH SỬ CHECK-IN",
+                text: "XEM LỊCH SỬ CHECK-IN",
                 color: Colors.grey[700]!,
+                width: 300,
+                height: 55,
                 isOutlined: true,
-                onTap: _navigateToHistory,
+                onPressed: _navigateToHistory,
               ),
 
               const SizedBox(height: 35),
@@ -244,30 +249,6 @@ class _CheckInScreenState extends State<CheckInScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildCustomButton({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required bool isOutlined,
-    required VoidCallback onTap,
-  }) {
-    final style = ElevatedButton.styleFrom(
-      backgroundColor: isOutlined ? Colors.white : color,
-      foregroundColor: isOutlined ? color : Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-      fixedSize: const Size(300, 55),
-      side: isOutlined ? BorderSide(color: color) : null,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-    );
-
-    return ElevatedButton.icon(
-      onPressed: onTap,
-      style: style,
-      icon: Icon(icon),
-      label: Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
     );
   }
 }

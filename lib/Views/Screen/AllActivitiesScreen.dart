@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:quanlidoanvien/Components/AppBarComponent.dart';
+import 'package:quanlidoanvien/Components/EmptyStateWidget.dart';
 import 'package:quanlidoanvien/Services/ActivityService.dart';
 import 'package:quanlidoanvien/Models/ActivityModel.dart';
 import 'package:quanlidoanvien/Views/Profile/ActivityDetail.dart';
@@ -76,17 +78,19 @@ class _AllActivitiesScreenState extends State<AllActivitiesScreen> {
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Hoạt động Đoàn"),
-        backgroundColor: const Color(0xFF0D47A1),
-        foregroundColor: Colors.white,
-      ),
+      appBar: const AppBarComponent(title: "Hoạt động Đoàn"),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage != null
           ? Center(child: Text(_errorMessage!, style: const TextStyle(color: Colors.red)))
           : _activities.isEmpty
-          ? const Center(child: Text("Hiện chưa có hoạt động nào."))
+          ? EmptyStateWidget(
+              message: "Chưa có hoạt động nào",
+              subMessage: "Các hoạt động phong trào sắp tới sẽ hiển thị tại đây",
+              icon: Icons.event_busy,
+              actionText: "Làm mới",
+              onAction: _loadData,
+            )
           : GridView.builder(
         padding: const EdgeInsets.all(10),
         itemCount: _activities.length,

@@ -3,11 +3,16 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:quanlidoanvien/Components/AppBarComponent.dart';
 import '../../Utils.dart';
 
 import '../Dashboard/CheckInScreen.dart';
 import 'package:quanlidoanvien/Views/Screen/CheckInHistoryScreen.dart';
 import 'package:quanlidoanvien/Views/Profile/StudentInfoScreen.dart';
+import 'package:quanlidoanvien/Views/Portal/SoDoanScreen.dart';
+import 'package:quanlidoanvien/Views/Portal/DoanPhiScreen.dart';
+import 'package:quanlidoanvien/Views/Portal/XepLoaiScreen.dart';
+import 'package:quanlidoanvien/Views/Portal/ChungNhanScreen.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -19,6 +24,8 @@ class AccountScreen extends StatefulWidget {
 class _AccountScreenState extends State<AccountScreen> {
   String _hoTen = "Đang tải...";
   String _email = "Đang tải...";
+  String _mssv = "";
+  String _lop = "";
 
   File? _avatarFile;
   String? _serverAvatarUrl;
@@ -36,6 +43,8 @@ class _AccountScreenState extends State<AccountScreen> {
       setState(() {
         _hoTen = info['name'] ?? "Sinh viên";
         _email = info['email'] ?? "Email";
+        _mssv = info['mssv'] ?? "";
+        _lop = info['lop'] ?? "";
         _serverAvatarUrl = info['avatar'];
       });
     }
@@ -85,7 +94,9 @@ class _AccountScreenState extends State<AccountScreen> {
         });
 
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Đổi ảnh thành công!"), backgroundColor: Colors.green));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Đổi ảnh thành công!"), backgroundColor: Colors.green),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lỗi: ${response.statusCode}")));
       }
@@ -105,35 +116,107 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
-      appBar: AppBar(
-        title: const Text("Cá nhân", style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        backgroundColor: const Color(0xFF0D47A1),
-        foregroundColor: Colors.white,
-        elevation: 0,
+      appBar: const AppBarComponent(
+        title: "Cá nhân & Cổng Đoàn Viên",
+        showBack: false,
       ),
       body: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 40),
         child: Column(
           children: [
             _buildProfileHeader(),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
+
+            // Nhóm 1: Hồ sơ & Sổ Đoàn
+            _buildSectionTitle("HỒ SƠ & SỔ ĐOÀN"),
             _buildMenuGroup([
-              _buildOptionItem(Icons.info_outline, "Thông tin Đoàn viên", const Color(0xFF0D47A1), () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentInfoScreen()));
-              }),
-              _buildOptionItem(Icons.qr_code_scanner, "Quét mã QR", const Color(0xFF1976D2), () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const CheckInScreen()));
-              }),
-              _buildOptionItem(Icons.history, "Lịch sử check-in", const Color(0xFF0288D1), () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const CheckInHistoryScreen()));
-              }),
+              _buildOptionItem(
+                Icons.badge_outlined,
+                "Thẻ & Thông tin Đoàn viên",
+                const Color(0xFF0D47A1),
+                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StudentInfoScreen())),
+              ),
+              _buildOptionItem(
+                Icons.folder_shared_outlined,
+                "Sổ Đoàn & Vị trí lưu trữ",
+                const Color(0xFF7E22CE),
+                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SoDoanScreen())),
+              ),
             ]),
-            const SizedBox(height: 15),
+
+            const SizedBox(height: 16),
+
+            // Nhóm 2: Tài chính & Thi đua
+            _buildSectionTitle("NGHĨA VỤ & THI ĐUA"),
             _buildMenuGroup([
-              _buildOptionItem(Icons.logout, "Đăng xuất", Colors.red, _handleLogout, isLogout: true),
+              _buildOptionItem(
+                Icons.account_balance_wallet_outlined,
+                "Đoàn phí của tôi",
+                const Color(0xFF059669),
+                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DoanPhiScreen())),
+              ),
+              _buildOptionItem(
+                Icons.workspace_premium_outlined,
+                "Bình bầu & Xếp loại thi đua",
+                const Color(0xFFD97706),
+                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const XepLoaiScreen())),
+              ),
+              _buildOptionItem(
+                Icons.verified_outlined,
+                "Giấy chứng nhận điện tử",
+                const Color(0xFF0284C7),
+                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChungNhanScreen())),
+              ),
             ]),
-            const SizedBox(height: 30),
+
+            const SizedBox(height: 16),
+
+            // Nhóm 3: Điểm danh & Check-in
+            _buildSectionTitle("ĐIỂM DANH HOẠT ĐỘNG"),
+            _buildMenuGroup([
+              _buildOptionItem(
+                Icons.qr_code_scanner,
+                "Quét mã QR điểm danh",
+                const Color(0xFF2563EB),
+                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CheckInScreen())),
+              ),
+              _buildOptionItem(
+                Icons.history,
+                "Lịch sử tham gia & Điểm danh",
+                const Color(0xFF475569),
+                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CheckInHistoryScreen())),
+              ),
+            ]),
+
+            const SizedBox(height: 16),
+
+            // Nhóm 4: Tài khoản
+            _buildMenuGroup([
+              _buildOptionItem(
+                Icons.logout,
+                "Đăng xuất",
+                Colors.red,
+                _handleLogout,
+                isLogout: true,
+              ),
+            ]),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: Color(0xFF94A3B8),
+          letterSpacing: 0.8,
         ),
       ),
     );
@@ -152,57 +235,105 @@ class _AccountScreenState extends State<AccountScreen> {
       padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(
         color: Color(0xFF0D47A1),
-        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
       ),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-        child: Row(
-          children: [
-            Stack(
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor: Colors.blue[100],
-                  backgroundImage: imageProvider,
-                  child: imageProvider == null ? const Icon(Icons.person, size: 50, color: Color(0xFF0D47A1)) : null,
-                ),
-                Positioned(
-                  bottom: 0, right: 0,
-                  child: GestureDetector(
-                    onTap: _pickImage,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(color: Color(0xFF0D47A1), shape: BoxShape.circle),
-                      child: const Icon(Icons.camera_alt, size: 14, color: Colors.white),
-                    ),
-                  ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
                 )
               ],
             ),
-            const SizedBox(width: 15),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _hoTen,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+            child: Row(
+              children: [
+                Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 36,
+                      backgroundColor: Colors.blue[100],
+                      backgroundImage: imageProvider,
+                      child: imageProvider == null
+                          ? const Icon(Icons.person, size: 40, color: Color(0xFF0D47A1))
+                          : null,
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: _pickImage,
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: const BoxDecoration(
+                            color: Colors.orange,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.camera_alt, color: Colors.white, size: 14),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _hoTen,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF0F172A),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      if (_mssv.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEFF6FF),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            "MSSV: $_mssv${_lop.isNotEmpty ? " • $_lop" : ""}",
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'monospace',
+                              color: Color(0xFF1D4ED8),
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _email,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF64748B),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _email,
-                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -210,17 +341,53 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget _buildMenuGroup(List<Widget> children) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
-      child: Column(children: children),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x060F172A),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: children,
+      ),
     );
   }
 
-  Widget _buildOptionItem(IconData icon, String title, Color color, VoidCallback onTap, {bool isLogout = false}) {
+  Widget _buildOptionItem(
+    IconData icon,
+    String title,
+    Color color,
+    VoidCallback onTap, {
+    bool isLogout = false,
+  }) {
     return ListTile(
-      leading: Icon(icon, color: color, size: 24),
-      title: Text(title, style: TextStyle(fontWeight: FontWeight.w500, color: isLogout ? Colors.red : Colors.black87)),
-      trailing: const Icon(Icons.chevron_right, color: Colors.blue),
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(icon, color: color, size: 20),
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: isLogout ? FontWeight.w700 : FontWeight.w600,
+          color: isLogout ? Colors.red : const Color(0xFF1E293B),
+        ),
+      ),
+      trailing: isLogout
+          ? null
+          : const Icon(Icons.chevron_right, size: 20, color: Color(0xFF94A3B8)),
       onTap: onTap,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
     );
   }
 }

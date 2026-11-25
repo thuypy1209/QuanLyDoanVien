@@ -1,27 +1,63 @@
 import 'package:flutter/material.dart';
 
-import 'package:quanlidoanvien/Utils.dart';
+class AppBarComponent extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final List<Widget>? actions;
+  final bool showBack;
+  final Widget? leading;
+  final Color backgroundColor;
+  final Color foregroundColor;
+  final bool centerTitle;
+  final double elevation;
+  final PreferredSizeWidget? bottom;
 
-class AppBarComponent extends StatelessWidget implements PreferredSizeWidget{
-  String titleValue;
+  const AppBarComponent({
+    super.key,
+    required this.title,
+    this.actions,
+    this.showBack = true,
+    this.leading,
+    this.backgroundColor = const Color(0xFF0D47A1),
+    this.foregroundColor = Colors.white,
+    this.centerTitle = true,
+    this.elevation = 0,
+    this.bottom,
+  });
 
-  AppBarComponent(this.titleValue);
+  // Constructor phụ tương thích nếu truyền vị trí
+  const AppBarComponent.fromTitle(
+    this.title, {
+    super.key,
+    this.actions,
+    this.showBack = true,
+    this.leading,
+    this.backgroundColor = const Color(0xFF0D47A1),
+    this.foregroundColor = Colors.white,
+    this.centerTitle = true,
+    this.elevation = 0,
+    this.bottom,
+  });
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return AppBar(
-      backgroundColor: Colors.green,
-      title: Text(titleValue, style: TextStyle(color: Colors.white)),
-      actions: [
-        Text("hello ${Utils.userName}", style: TextStyle(color: Colors.white, fontSize: 20)),
-        SizedBox(width: 20,)
-      ],
+      title: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+      ),
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+      centerTitle: centerTitle,
+      elevation: elevation,
+      automaticallyImplyLeading: showBack && leading == null,
+      leading: leading,
+      actions: actions,
+      bottom: bottom,
     );
   }
 
   @override
-  // TODO: implement preferredSize
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-
+  Size get preferredSize => Size.fromHeight(
+        kToolbarHeight + (bottom?.preferredSize.height ?? 0.0),
+      );
 }

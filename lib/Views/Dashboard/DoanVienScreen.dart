@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:quanlidoanvien/Components/StatusBadge.dart';
+import 'package:quanlidoanvien/Components/EmptyStateWidget.dart';
 import 'package:quanlidoanvien/Services/StudentService.dart';
 import 'package:quanlidoanvien/Models/StudentModel.dart';
 import 'package:quanlidoanvien/Services/ActivityService.dart';
@@ -7,7 +9,12 @@ import 'package:quanlidoanvien/Utils.dart';
 import 'CheckInScreen.dart';
 import 'package:quanlidoanvien/Views/Screen/CheckInHistoryScreen.dart';
 import 'package:quanlidoanvien/Views/Profile/ActivityDetail.dart';
+import 'package:quanlidoanvien/Views/Profile/StudentInfoScreen.dart';
 import 'package:quanlidoanvien/Views/Screen/AllActivitiesScreen.dart';
+import 'package:quanlidoanvien/Views/Portal/SoDoanScreen.dart';
+import 'package:quanlidoanvien/Views/Portal/DoanPhiScreen.dart';
+import 'package:quanlidoanvien/Views/Portal/XepLoaiScreen.dart';
+import 'package:quanlidoanvien/Views/Portal/ChungNhanScreen.dart';
 
 class DoanVienScreen extends StatefulWidget {
   const DoanVienScreen({super.key});
@@ -249,20 +256,7 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
                   children: [
                     const Text("Xếp loại", style: TextStyle(color: Colors.grey)),
                     const SizedBox(height: 5),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: getMauXepLoai(diemHienThi).withValues(alpha:0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        getXepLoai(diemHienThi),
-                        style: TextStyle(
-                          color: getMauXepLoai(diemHienThi),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                    StatusBadge.fromXepLoai(getXepLoai(diemHienThi)),
                   ],
                 ),
               ],
@@ -275,28 +269,75 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
 
   Widget _buildQuickMenu() {
     return Padding(
-      padding: const EdgeInsets.only(top: 50, left: 20, right: 20),
+      padding: const EdgeInsets.only(top: 50, left: 16, right: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Tiện ích", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 15),
           Row(
-            // 👇 SỬA Ở ĐÂY: Đổi từ spaceBetween thành spaceEvenly
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildMenuItem(Icons.app_registration, "Đăng ký\nHoạt động", Colors.blue, () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const AllActivitiesScreen()));
+              const Text(
+                "Tiện ích Cổng Đoàn Viên",
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEFF6FF),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Text(
+                  "Hệ sinh thái Đoàn",
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF1D4ED8)),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // Row 1
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildMenuItem(Icons.event_available_rounded, "Đăng ký
+Hoạt động", const Color(0xFF2563EB), () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const AllActivitiesScreen()));
               }),
-
-              // Nếu dùng MainAxisAlignment.center thì bạn có thể thêm SizedBox(width: 20) ở đây để tạo khoảng cách
-
-              _buildMenuItem(Icons.history, "Lịch sử\nTham gia", Colors.orange, () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const CheckInHistoryScreen()));
+              _buildMenuItem(Icons.folder_shared_rounded, "Sổ Đoàn
+Điện tử", const Color(0xFF7E22CE), () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const SoDoanScreen()));
               }),
+              _buildMenuItem(Icons.account_balance_wallet_rounded, "Nghĩa vụ
+Đoàn phí", const Color(0xFF059669), () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const DoanPhiScreen()));
+              }),
+              _buildMenuItem(Icons.workspace_premium_rounded, "Bình bầu
+Xếp loại", const Color(0xFFD97706), () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const XepLoaiScreen()));
+              }),
+            ],
+          ),
+          const SizedBox(height: 14),
 
-              _buildMenuItem(Icons.qr_code_scanner, "Quét mã\nĐiểm danh", Colors.purple, () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const CheckInScreen()));
+          // Row 2
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildMenuItem(Icons.verified_rounded, "Chứng nhận
+Điện tử", const Color(0xFF0284C7), () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const ChungNhanScreen()));
+              }),
+              _buildMenuItem(Icons.qr_code_scanner_rounded, "Quét mã
+Điểm danh", const Color(0xFF4F46E5), () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const CheckInScreen()));
+              }),
+              _buildMenuItem(Icons.history_rounded, "Lịch sử
+Check-in", const Color(0xFFEA580C), () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const CheckInHistoryScreen()));
+              }),
+              _buildMenuItem(Icons.badge_rounded, "Hồ sơ
+Đoàn viên", const Color(0xFF0D47A1), () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const StudentInfoScreen()));
               }),
             ],
           ),
@@ -308,20 +349,34 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
   Widget _buildMenuItem(IconData icon, String title, Color color, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(15),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-                color: color.withValues(alpha:0.1),
-                borderRadius: BorderRadius.circular(15)
+      borderRadius: BorderRadius.circular(16),
+      child: SizedBox(
+        width: 76,
+        child: Column(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(icon, color: color, size: 26),
             ),
-            child: Icon(icon, color: color, size: 28),
-          ),
-          const SizedBox(height: 8),
-          Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: Colors.black87)),
-        ],
+            const SizedBox(height: 6),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF334155),
+                height: 1.2,
+              ),
+              maxLines: 2,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -349,11 +404,12 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
           const SizedBox(height: 10),
 
           if (_activities.isEmpty)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Text("Hiện chưa có hoạt động nào.", style: TextStyle(color: Colors.grey)),
-              ),
+            EmptyStateWidget(
+              message: "Chưa có hoạt động nào",
+              subMessage: "Các hoạt động phong trào sắp tới sẽ hiển thị tại đây",
+              icon: Icons.event_busy,
+              actionText: "Làm mới",
+              onAction: _fetchData,
             )
           else
             ..._activities.map((act) => GestureDetector(
@@ -455,10 +511,11 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
             ),
           ),
           if (isRegistered)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(color: Colors.green.withValues(alpha:0.1), borderRadius: BorderRadius.circular(20)),
-              child: const Text("Đã ĐK", style: TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.bold)),
+            const StatusBadge(
+              label: "Đã ĐK",
+              color: Color(0xFF2E7D32),
+              fontSize: 10,
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             )
           else
             const Icon(Icons.chevron_right, color: Colors.grey),

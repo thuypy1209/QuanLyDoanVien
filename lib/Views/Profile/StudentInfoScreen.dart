@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:quanlidoanvien/Components/AppBarComponent.dart';
+import 'package:quanlidoanvien/Components/DigitalUnionCard.dart';
 import 'package:quanlidoanvien/Services/StudentService.dart'; // Import Service
 import 'package:quanlidoanvien/Models/StudentModel.dart';
 import 'package:quanlidoanvien/Utils.dart';
@@ -102,13 +104,7 @@ class _StudentInfoScreenState extends State<StudentInfoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
-      appBar: AppBar(
-        title: const Text("Thông tin Đoàn viên", style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        backgroundColor: const Color(0xFF0D47A1),
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
+      appBar: const AppBarComponent(title: "Thông tin Đoàn viên"),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
@@ -195,6 +191,23 @@ class _StudentInfoScreenState extends State<StudentInfoScreen> {
             ],
           ),
         ),
+
+            const SizedBox(height: 16),
+
+            // --- THẺ ĐOÀN VIÊN ĐIỆN TỬ (Tương tự Web Portal) ---
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: DigitalUnionCard(
+                hoTen: _student?.hoTen ?? "Sinh viên",
+                mssv: _student?.mssv ?? "---",
+                lop: _student?.lop ?? "---",
+                khoa: _student?.khoa ?? "---",
+                diemRenLuyen: _student?.diemRenLuyen ?? 0,
+                avatarUrl: (_student?.avatarUrl != null && _student!.avatarUrl!.isNotEmpty)
+                    ? "${Utils.baseUrl}${_student!.avatarUrl}"
+                    : null,
+              ),
+            ),
 
             const SizedBox(height: 20),
 

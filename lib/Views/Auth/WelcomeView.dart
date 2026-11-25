@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quanlidoanvien/Components/ButtonComponent.dart';
 
 class WelcomeView extends StatelessWidget {
   const WelcomeView({super.key});
@@ -65,56 +66,22 @@ class WelcomeView extends StatelessWidget {
               const Spacer(),
 
               // Nut Dang nhap (Chinh)
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/login');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0D47A1),
-                    foregroundColor: Colors.white,
-                    elevation: 3,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  child: const Text(
-                    "Đăng nhập ngay",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+              ButtonComponent(
+                text: "Đăng nhập ngay",
+                onPressed: () {
+                  Navigator.pushNamed(context, '/login');
+                },
               ),
 
               const SizedBox(height: 15),
 
               // Nut Dang ky (Phu)
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/register');
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF0D47A1), width: 1.5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  child: const Text(
-                    "Đăng ký tài khoản mới",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF0D47A1),
-                    ),
-                  ),
-                ),
+              ButtonComponent(
+                text: "Đăng ký tài khoản mới",
+                isOutlined: true,
+                onPressed: () {
+                  Navigator.pushNamed(context, '/register');
+                },
               ),
 
               const SizedBox(height: 50),

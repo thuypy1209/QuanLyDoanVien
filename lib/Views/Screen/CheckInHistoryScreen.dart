@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:quanlidoanvien/Components/AppBarComponent.dart';
+import 'package:quanlidoanvien/Components/StatusBadge.dart';
+import 'package:quanlidoanvien/Components/EmptyStateWidget.dart';
 import 'package:quanlidoanvien/Services/ActivityService.dart';
 import 'package:quanlidoanvien/Models/ActivityModel.dart';
 import 'package:quanlidoanvien/Repository/ApiResponse.dart';
@@ -34,11 +37,7 @@ class _CheckInHistoryScreenState extends State<CheckInHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Hoạt động đã đăng ký"),
-        backgroundColor: const Color(0xFF0D47A1),
-        foregroundColor: Colors.white,
-      ),
+      appBar: const AppBarComponent(title: "Hoạt động đã đăng ký"),
       body: FutureBuilder<ApiResponse<List<ActivityModel>>>(
         future: _futureHistory,
         builder: (context, snapshot) {
@@ -77,9 +76,10 @@ class _CheckInHistoryScreenState extends State<CheckInHistoryScreen> {
           // 4. Danh sách rỗng
           final history = response.data;
           if (history == null || history.isEmpty) {
-            return const Center(
-              child: Text("Bạn chưa đăng ký hoạt động nào.",
-                  style: TextStyle(color: Colors.grey, fontSize: 16)),
+            return const EmptyStateWidget(
+              message: "Bạn chưa đăng ký hoạt động nào",
+              subMessage: "Hãy vào trang Hoạt động để đăng ký tham gia các phong trào nhé",
+              icon: Icons.event_note,
             );
           }
 
@@ -116,30 +116,9 @@ class _CheckInHistoryScreenState extends State<CheckInHistoryScreen> {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text("Thời gian: ${_formatDate(item.thoiGianBatDau)}"),
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      // Hiển thị trạng thái chữ
-                      Text(
-                        isCheckedIn ? "Đã tham gia" : "Đã đăng ký",
-                        style: TextStyle(
-                            color: isCheckedIn ? Colors.green : Colors.blue,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12
-                        ),
-                      ),
-                      // Nếu đã tham gia thì hiện điểm cộng
-                      if(isCheckedIn && (item.diemCong ?? 0) > 0)
-                        Text("+${item.diemCong} điểm",
-                            style: const TextStyle(fontSize: 11, color: Colors.orange, fontWeight: FontWeight.bold)
-                        ),
-                      // Nếu chưa tham gia thì hiện nhắc nhở
-                      if(!isCheckedIn)
-                        const Text("Chưa check-in",
-                            style: TextStyle(fontSize: 10, color: Colors.grey)
-                        ),
-                    ],
+                  trailing: StatusBadge.checkInStatus(
+                    isCheckedIn: isCheckedIn,
+                    diem: item.diemCong,
                   ),
                 );
               },
