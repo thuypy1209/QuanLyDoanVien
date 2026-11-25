@@ -299,20 +299,16 @@ class _DoanVienScreenState extends State<DoanVienScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildMenuItem(Icons.event_available_rounded, "Đăng ký
-Hoạt động", const Color(0xFF2563EB), () {
+              _buildMenuItem(Icons.event_available_rounded, "Đăng ký\nHoạt động", const Color(0xFF2563EB), () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const AllActivitiesScreen()));
               }),
-              _buildMenuItem(Icons.folder_shared_rounded, "Sổ Đoàn
-Điện tử", const Color(0xFF7E22CE), () {
+              _buildMenuItem(Icons.folder_shared_rounded, "Sổ Đoàn\nĐiện tử", const Color(0xFF7E22CE), () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const SoDoanScreen()));
               }),
-              _buildMenuItem(Icons.account_balance_wallet_rounded, "Nghĩa vụ
-Đoàn phí", const Color(0xFF059669), () {
+              _buildMenuItem(Icons.account_balance_wallet_rounded, "Nghĩa vụ\nĐoàn phí", const Color(0xFF059669), () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const DoanPhiScreen()));
               }),
-              _buildMenuItem(Icons.workspace_premium_rounded, "Bình bầu
-Xếp loại", const Color(0xFFD97706), () {
+              _buildMenuItem(Icons.workspace_premium_rounded, "Bình bầu\nXếp loại", const Color(0xFFD97706), () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const XepLoaiScreen()));
               }),
             ],
@@ -323,20 +319,16 @@ Xếp loại", const Color(0xFFD97706), () {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildMenuItem(Icons.verified_rounded, "Chứng nhận
-Điện tử", const Color(0xFF0284C7), () {
+              _buildMenuItem(Icons.verified_rounded, "Chứng nhận\nĐiện tử", const Color(0xFF0284C7), () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const ChungNhanScreen()));
               }),
-              _buildMenuItem(Icons.qr_code_scanner_rounded, "Quét mã
-Điểm danh", const Color(0xFF4F46E5), () {
+              _buildMenuItem(Icons.qr_code_scanner_rounded, "Quét mã\nĐiểm danh", const Color(0xFF4F46E5), () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const CheckInScreen()));
               }),
-              _buildMenuItem(Icons.history_rounded, "Lịch sử
-Check-in", const Color(0xFFEA580C), () {
+              _buildMenuItem(Icons.history_rounded, "Lịch sử\nCheck-in", const Color(0xFFEA580C), () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const CheckInHistoryScreen()));
               }),
-              _buildMenuItem(Icons.badge_rounded, "Hồ sơ
-Đoàn viên", const Color(0xFF0D47A1), () {
+              _buildMenuItem(Icons.badge_rounded, "Hồ sơ\nĐoàn viên", const Color(0xFF0D47A1), () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const StudentInfoScreen()));
               }),
             ],
