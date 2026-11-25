@@ -108,7 +108,7 @@ class _AccountScreenState extends State<AccountScreen> {
       appBar: AppBar(
         title: const Text("Cá nhân", style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
-        backgroundColor: const Color(0xFF3D5AFE),
+        backgroundColor: const Color(0xFF0D47A1),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -118,13 +118,13 @@ class _AccountScreenState extends State<AccountScreen> {
             _buildProfileHeader(),
             const SizedBox(height: 20),
             _buildMenuGroup([
-              _buildOptionItem(Icons.info_outline, "Thông tin Đoàn viên", Colors.blue, () {
+              _buildOptionItem(Icons.info_outline, "Thông tin Đoàn viên", const Color(0xFF0D47A1), () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentInfoScreen()));
               }),
-              _buildOptionItem(Icons.qr_code_scanner, "Quét mã QR", Colors.blueAccent, () {
+              _buildOptionItem(Icons.qr_code_scanner, "Quét mã QR", const Color(0xFF1976D2), () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const CheckInScreen()));
               }),
-              _buildOptionItem(Icons.history, "Lịch sử check-in", Colors.blue, () {
+              _buildOptionItem(Icons.history, "Lịch sử check-in", const Color(0xFF0288D1), () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const CheckInHistoryScreen()));
               }),
             ]),
@@ -151,7 +151,7 @@ class _AccountScreenState extends State<AccountScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(
-        color: Color(0xFF3D5AFE),
+        color: Color(0xFF0D47A1),
         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
       ),
       child: Container(
@@ -165,7 +165,7 @@ class _AccountScreenState extends State<AccountScreen> {
                   radius: 40,
                   backgroundColor: Colors.blue[100],
                   backgroundImage: imageProvider,
-                  child: imageProvider == null ? const Icon(Icons.person, size: 50, color: Colors.blue) : null,
+                  child: imageProvider == null ? const Icon(Icons.person, size: 50, color: Color(0xFF0D47A1)) : null,
                 ),
                 Positioned(
                   bottom: 0, right: 0,
@@ -173,7 +173,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     onTap: _pickImage,
                     child: Container(
                       padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(color: Color(0xFF3D5AFE), shape: BoxShape.circle),
+                      decoration: const BoxDecoration(color: Color(0xFF0D47A1), shape: BoxShape.circle),
                       child: const Icon(Icons.camera_alt, size: 14, color: Colors.white),
                     ),
                   ),
@@ -185,9 +185,19 @@ class _AccountScreenState extends State<AccountScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(_email, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(
+                    _hoTen,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   const SizedBox(height: 4),
-                  Text(_hoTen, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                  Text(
+                    _email,
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
               ),
             ),

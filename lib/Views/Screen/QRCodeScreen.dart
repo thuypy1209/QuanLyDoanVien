@@ -33,7 +33,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final String qrUrl = 'http://10.0.2.2:5000/api/HoatDong/qr/${widget.activityId}';
+    final String qrUrl = '${Utils.baseUrl}/api/HoatDong/qr/${widget.activityId}';
 
     return Scaffold(
       appBar: AppBar(

@@ -216,6 +216,30 @@ class _CheckInScreenState extends State<CheckInScreen> {
                 isOutlined: true,
                 onTap: _navigateToHistory,
               ),
+
+              const SizedBox(height: 35),
+
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 40),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: const Color(0xFF0D47A1), size: 22),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        "Hướng camera thẳng vào mã QR sự kiện và giữ khoảng cách 20-30cm để điểm danh tự động.",
+                        style: TextStyle(fontSize: 12, color: Colors.blue[900], height: 1.4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

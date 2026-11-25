@@ -4,8 +4,6 @@ import 'CheckInScreen.dart';      // Đây là nội dung Tab 2
 import 'ChatScreen.dart';// Đây là nội dung Tab 3
 import 'AccountScreen.dart';// Đây là nội dung Tab 4
 
-import 'package:flutter/material.dart';
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -27,7 +25,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _pages,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {

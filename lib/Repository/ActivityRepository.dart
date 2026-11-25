@@ -6,7 +6,7 @@ import 'ApiResponse.dart';
 
 class ActivityRepository {
 
-  static const String baseUrl = 'http://10.0.2.2:5000/api/HoatDong';
+  static String get baseUrl => '${Utils.baseUrl}/api/HoatDong';
 
   // Hàm lấy danh sách hoạt động
   Future<ApiResponse<List<ActivityModel>>> getActivities() async {

@@ -1,11 +1,29 @@
 import 'dart:convert';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 class Utils {
   static GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-  static String baseUrl = 'http://10.0.2.2:5000';
+
+  // Tự động nhận diện thiết bị:
+  // - Nếu chạy trên Web (Chrome/Edge): Dùng localhost
+  // - Nếu chạy trên Windows/macOS/Linux Desktop: Dùng localhost
+  // - Nếu chạy trên Máy ảo Android (Emulator): Dùng 10.0.2.2
+  // - Nếu chạy trên Máy thật Android: Dùng localhost (với lệnh 'adb reverse tcp:5000 tcp:5000') hoặc IP mạng LAN
+  static String get baseUrl {
+    if (kIsWeb) {
+      return 'http://localhost:5000';
+    }
+    try {
+      if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+        return 'http://localhost:5000';
+      }
+    } catch (_) {}
+    return 'http://10.0.2.2:5000';
+  }
 
   static int selectIndex = 0;
   static String userName = "";

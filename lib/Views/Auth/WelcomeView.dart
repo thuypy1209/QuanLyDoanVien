@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:quanlidoanvien/Views/Auth/LoginView.dart'; // Import để chuyển sang màn hình đăng nhập
 
 class WelcomeView extends StatelessWidget {
   const WelcomeView({super.key});
@@ -65,10 +64,38 @@ class WelcomeView extends StatelessWidget {
 
               const Spacer(),
 
-              // dang ki
+              // Nut Dang nhap (Chinh)
               SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/login');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0D47A1),
+                    foregroundColor: Colors.white,
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: const Text(
+                    "Đăng nhập ngay",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 15),
+
+              // Nut Dang ky (Phu)
+              SizedBox(
+                width: double.infinity,
+                height: 52,
                 child: OutlinedButton(
                   onPressed: () {
                     Navigator.pushNamed(context, '/register');
@@ -88,29 +115,6 @@ class WelcomeView extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // chuyen sang dang nhap
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Đã là Đoàn viên? ", style: TextStyle(color: Colors.black87)),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/login');
-                    },
-                    child: const Text(
-                      "Đăng nhập ngay",
-                      style: TextStyle(
-                        color: Color(0xFF0D47A1),
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-                ],
               ),
 
               const SizedBox(height: 50),

@@ -21,7 +21,11 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    _loadMyName();
+    _initChat();
+  }
+
+  Future<void> _initChat() async {
+    await _loadMyName();
     _setupChat();
   }
 
@@ -47,12 +51,14 @@ class _ChatScreenState extends State<ChatScreen> {
 
     _chatService.initSignalR().catchError((e) => print("Lỗi kết nối Chat: $e"));
   }
+
   Future<void> _loadMyName() async {
-    // Gọi hàm getName() mà ní đã thêm ở file Utils
     String name = await Utils.getName();
-    setState(() {
-      _myName = name;
-    });
+    if (mounted) {
+      setState(() {
+        _myName = name;
+      });
+    }
   }
   void _handleSend() async {
     if (_controller.text.trim().isNotEmpty && _isConnected) {
@@ -87,16 +93,43 @@ class _ChatScreenState extends State<ChatScreen> {
       backgroundColor: const Color(0xFFF5F7FB),
       appBar: AppBar(
         title: const Text("Tư vấn trực tuyến", style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF3D5AFE),
+        backgroundColor: const Color(0xFF0D47A1),
+        foregroundColor: Colors.white,
         centerTitle: true,
         elevation: 0,
       ),
       body: Column(
         children: [
           if (!_isConnected)
-            const LinearProgressIndicator(
-                backgroundColor: Colors.orange,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white)
+            Container(
+              width: double.infinity,
+              color: const Color(0xFFFFF3E0),
+              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(
+                    width: 12,
+                    height: 12,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.orange),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    "Đang kết nối máy chủ...",
+                    style: TextStyle(fontSize: 12, color: Colors.deepOrange, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(width: 10),
+                  InkWell(
+                    onTap: () {
+                      _chatService.initSignalR().catchError((e) => print("Lỗi kết nối Chat: $e"));
+                    },
+                    child: const Text(
+                      "(Thử lại)",
+                      style: TextStyle(fontSize: 12, color: Colors.blue, fontWeight: FontWeight.bold, decoration: TextDecoration.underline),
+                    ),
+                  )
+                ],
+              ),
             ),
 
           Expanded(
@@ -145,7 +178,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
-                    color: isMe ? const Color(0xFF3D5AFE) : Colors.white,
+                    color: isMe ? const Color(0xFF0D47A1) : Colors.white,
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(15),
                       topRight: const Radius.circular(15),
@@ -210,7 +243,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             const SizedBox(width: 8),
             CircleAvatar(
-              backgroundColor: const Color(0xFF3D5AFE),
+              backgroundColor: const Color(0xFF0D47A1),
               child: IconButton(
                 icon: const Icon(Icons.send, color: Colors.white, size: 20),
                 onPressed: _handleSend,

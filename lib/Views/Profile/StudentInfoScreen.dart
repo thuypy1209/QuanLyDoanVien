@@ -105,7 +105,7 @@ class _StudentInfoScreenState extends State<StudentInfoScreen> {
       appBar: AppBar(
         title: const Text("Thông tin Đoàn viên", style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
-        backgroundColor: const Color(0xFF3D5AFE),
+        backgroundColor: const Color(0xFF0D47A1),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -119,7 +119,7 @@ class _StudentInfoScreenState extends State<StudentInfoScreen> {
               width: double.infinity,
               padding: const EdgeInsets.only(bottom: 30),
               decoration: const BoxDecoration(
-                color: Color(0xFF3D5AFE),
+                color: Color(0xFF0D47A1),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30),
@@ -146,7 +146,7 @@ class _StudentInfoScreenState extends State<StudentInfoScreen> {
                               : null,
                           // Hiện icon nếu không có bất kỳ ảnh nào
                           child: (_imageFile == null && (_student?.avatarUrl == null || _student!.avatarUrl!.isEmpty))
-                              ? const Icon(Icons.person, size: 60, color: Color(0xFF3D5AFE))
+                              ? const Icon(Icons.person, size: 60, color: Color(0xFF0D47A1))
                               : null,
                         ),
                       ),
@@ -244,7 +244,7 @@ class _StudentInfoScreenState extends State<StudentInfoScreen> {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF3D5AFE), Color(0xFF0D47A1)],
+                  colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -295,7 +295,7 @@ class _StudentInfoScreenState extends State<StudentInfoScreen> {
               color: Colors.blue.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, size: 20, color: const Color(0xFF3D5AFE)),
+            child: Icon(icon, size: 20, color: const Color(0xFF0D47A1)),
           ),
           const SizedBox(width: 15),
           Expanded(

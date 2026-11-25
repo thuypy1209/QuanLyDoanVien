@@ -97,7 +97,7 @@ class _AllActivitiesScreenState extends State<AllActivitiesScreen> {
           crossAxisSpacing: 10,
           mainAxisSpacing: 10,
 
-          childAspectRatio: isLandscape ? 1.3 : 0.75,
+          childAspectRatio: isLandscape ? 1.3 : 0.68,
         ),
 
         itemBuilder: (ctx, index) {
@@ -140,7 +140,7 @@ class _AllActivitiesScreenState extends State<AllActivitiesScreen> {
                   Expanded(
                     flex: 2,
                     child: Padding(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -154,7 +154,7 @@ class _AllActivitiesScreenState extends State<AllActivitiesScreen> {
                             overflow: TextOverflow.ellipsis,
                           ),
 
-                          const Spacer(),
+                          const SizedBox(height: 6),
                           Row(
                             children: [
                               const Icon(Icons.calendar_today, size: 12, color: Colors.grey),
